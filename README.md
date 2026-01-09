@@ -2,6 +2,9 @@
 
 A beautiful Chrome extension that tracks your time spent across all websites. Built with React, TypeScript, and Tailwind CSS.
 
+<img width="1855" height="958" alt="Screenshot from 2026-01-10 02-12-49" src="https://github.com/user-attachments/assets/6432300c-7972-4585-81dd-10be1720803c" />
+<img width="1855" height="958" alt="Screenshot from 2026-01-10 02-13-05" src="https://github.com/user-attachments/assets/bfa7cb23-7853-4949-a1f2-6fafe4a6b2fa" />
+
 ## Features
 
 - **Real-time Tracking** - Automatically tracks time spent on every website
