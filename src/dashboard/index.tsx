@@ -1,3 +1,11 @@
+/**
+ * Dashboard - Main analytics view for the Time Tracker extension
+ *
+ * Views:
+ * - dashboard: Shows stats, charts, and detailed activity list
+ * - whitelist: Manage excluded domains
+ * - settings: Configure tracking delay
+ */
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -27,13 +35,14 @@ import {
 } from "lucide-react";
 import "../index.css";
 
+/** Chart colors - warm palette matching the red theme */
 const COLORS = [
-  "#f87171", // Red 400
-  "#fb923c", // Orange 400
-  "#fbbf24", // Amber 400
-  "#f472b6", // Pink 400
-  "#e879f9", // Fuchsia 400
-  "#c084fc", // Purple 400
+  "#f87171",
+  "#fb923c",
+  "#fbbf24",
+  "#f472b6",
+  "#e879f9",
+  "#c084fc",
 ];
 
 export function Dashboard() {
@@ -104,7 +113,6 @@ export function Dashboard() {
 
   return (
     <div className="h-screen bg-black text-white font-sans flex relative overflow-hidden selection:bg-red-500/30">
-
       {/* Sidebar */}
       <aside className="w-72 h-full p-6 flex flex-col gap-10 border-r border-white/10 relative z-10 bg-black overflow-y-auto">
         <div className="flex items-center gap-3 px-2">

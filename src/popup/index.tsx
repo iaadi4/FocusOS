@@ -1,3 +1,9 @@
+/**
+ * Popup - Toolbar widget for quick stats view
+ *
+ * Shows today's total browsing time, top 3 sites, and a link to the full dashboard.
+ * Refreshes every second to show live tracking updates.
+ */
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { getAggregatedData } from "../utils/storage";
@@ -46,22 +52,18 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-full h-full p-0 bg-black text-white flex flex-col font-sans selection:bg-cyan-500/30 overflow-hidden relative">
-      {/* Background Gradients */}
-      <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-cyan-600/30 rounded-full blur-[60px] pointer-events-none"></div>
-      <div className="absolute bottom-[-50px] left-[-50px] w-32 h-32 bg-blue-600/30 rounded-full blur-[60px] pointer-events-none"></div>
-
+    <div className="w-full h-full p-0 bg-black text-white flex flex-col font-sans selection:bg-red-500/30 overflow-hidden relative">
       <div className="px-6 py-4 flex-1 flex flex-col relative z-10">
         <header className="flex items-center justify-between mb-8">
           <h1 className="text-xl font-bold flex items-center gap-2 tracking-tight">
-            <img src="/icon48.png" className="w-8 h-8 rounded-lg" alt="Logo" />
+            <img src="/icon128.png" className="w-8 h-8 rounded-lg" alt="Logo" />
             <span>Time Tracker</span>
           </h1>
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
         </header>
 
         <div className="glass-panel p-6 rounded-2xl mb-6 text-center shadow-lg border-white/10 bg-white/5 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-rose-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3 relative z-10">
             Today's Browsing
           </h2>
@@ -76,7 +78,7 @@ export function Sidebar() {
         <div className="flex-1 overflow-y-auto mb-4 scrollbar-hide">
           <div className="flex items-center justify-between mb-3 px-1">
             <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-1">
-              <Activity className="w-3 h-3 text-cyan-400" />
+              <Activity className="w-3 h-3 text-red-400" />
               Top Sites
             </h3>
           </div>
@@ -103,7 +105,7 @@ export function Sidebar() {
                     {site.domain}
                   </span>
                 </div>
-                <span className="text-xs font-mono font-medium text-cyan-400/80 group-hover:text-cyan-400">
+                <span className="text-xs font-mono font-medium text-red-400/80 group-hover:text-red-400">
                   {formatDuration(site.time)}
                 </span>
               </div>
@@ -122,7 +124,7 @@ export function Sidebar() {
           </p>
           <button
             onClick={openDashboard}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm shadow-lg shadow-cyan-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold text-sm shadow-lg shadow-red-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           >
             <span>Full Dashboard</span>
             <Maximize2 className="w-4 h-4" />

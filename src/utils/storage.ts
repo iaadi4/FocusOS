@@ -1,3 +1,12 @@
+/**
+ * Storage Utilities - Chrome storage API wrapper
+ *
+ * Key functions:
+ * - saveTime(): Save browsing time for a domain
+ * - getAggregatedData(): Get stats for a time range
+ * - getSettings/setSettings(): Manage user preferences
+ * - addToWhitelist/removeFromWhitelist(): Manage excluded domains
+ */
 import type {
   StorageData,
   DailyData,
