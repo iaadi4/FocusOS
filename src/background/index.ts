@@ -79,14 +79,12 @@ function getFavicon(url: string): string {
 async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   const limit = await getLimit(domain);
   if (!limit) return;
-
   const usage = await getDailyUsage(domain);
   const totalTime = usage.time + timeToAdd;
 
   const is80Percent = totalTime >= limit.timeLimit * 0.8;
   const is100Percent = totalTime >= limit.timeLimit;
 
-  // Check 80% notification
   if (
     limit.notify80 &&
     is80Percent &&
@@ -95,25 +93,23 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   ) {
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "icon128.png",
+      iconUrl: "icon_white.png",
       title: "Time Tracker Alert",
       message: `You have used 80% of your daily limit for ${domain}.`,
     });
     await updateNotificationState(domain, { sent80: true });
   }
 
-  // Check 100% notification
   if (limit.notify100 && is100Percent && !usage.notifications.sent100) {
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "icon128.png",
+      iconUrl: "icon_white.png",
       title: "Time Tracker Alert",
       message: `You have reached your daily limit for ${domain}.`,
     });
     await updateNotificationState(domain, { sent100: true });
   }
 
-  // Block if limit reached and blocking enabled
   if (limit.blockOnLimit && is100Percent) {
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -128,10 +124,6 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   }
 }
 
-/**
- * Calculates and saves the time spent on the previous URL.
- * Called before switching to a new URL or when the user leaves.
- */
 async function commitTime(): Promise<void> {
   const data = (await chrome.storage.local.get(
     Object.values(STORAGE_KEYS)

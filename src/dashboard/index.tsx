@@ -100,6 +100,17 @@ export function Dashboard() {
   const [themes, setThemes] = useState<import("../utils/themes").Theme[]>([]);
   useEffect(() => {
     import("../utils/themes").then(({ THEMES }) => setThemes(THEMES));
+
+    // Persist default settings if not present or incomplete (fixes blocked page theme)
+    getStorageData("settings").then((data) => {
+      if (!data.settings || !data.settings.theme) {
+        setSettings({
+          theme: "blue-500",
+          trackingDelaySeconds: 15,
+          ...data.settings, // Keep existing if any, but ensure defaults
+        });
+      }
+    });
   }, []);
 
   // Theme-based colors for charts (varied hues for distinction)
@@ -225,8 +236,8 @@ export function Dashboard() {
     <div className="h-screen bg-black text-white font-sans flex relative overflow-hidden selection:bg-primary/30">
       <aside
         className={`${
-          isSidebarCollapsed ? "w-20" : "w-72"
-        } h-full pt-8 pb-4 px-4 flex flex-col gap-6 border-r border-white/10 relative z-10 bg-black overflow-y-auto transition-all duration-300 ease-in-out`}
+          isSidebarCollapsed ? "w-20 px-2" : "w-72 px-4"
+        } h-full pt-8 pb-4 flex flex-col gap-6 border-r border-white/10 relative z-10 bg-black overflow-y-auto transition-all duration-300 ease-in-out`}
       >
         <div
           className={`flex items-center gap-3 px-2 ${
@@ -308,14 +319,14 @@ export function Dashboard() {
                 ? "bg-white/10 text-white shadow-inner"
                 : "text-neutral-400 hover:bg-white/5 hover:text-white"
             } ${isSidebarCollapsed ? "justify-center" : ""}`}
-            title={isSidebarCollapsed ? "Excluded Sites" : ""}
+            title={isSidebarCollapsed ? "Whitelist" : ""}
           >
             <Shield
               className={`w-5 h-5 flex-shrink-0 ${
                 view === "whitelist" ? "text-primary" : ""
               }`}
             />
-            {!isSidebarCollapsed && <span>Excluded Sites</span>}
+            {!isSidebarCollapsed && <span>Whitelist</span>}
           </button>
           <button
             onClick={() => setView("settings")}
@@ -359,7 +370,7 @@ export function Dashboard() {
             <h2 className="text-4xl font-black tracking-tight mb-1 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500">
               {view === "dashboard" && "Your Performance"}
               {view === "limits" && "Daily Limits"}
-              {view === "whitelist" && "Excluded Sites"}
+              {view === "whitelist" && "Whitelist"}
               {view === "site-analysis" && "Site Analysis"}
               {view === "settings" && "Settings"}
               {view === "site-details" && "Site Details"}
@@ -367,7 +378,7 @@ export function Dashboard() {
             <p className="text-neutral-400 font-medium">
               {view === "dashboard" && `Deep dive into your focus metrics.`}
               {view === "limits" && "Set daily time limits for distractions."}
-              {view === "whitelist" && "Manage websites that won't be tracked."}
+              {view === "whitelist" && "Manage allowed websites."}
               {view === "settings" &&
                 "Configure how the extension tracks your time."}
               {view === "site-analysis" &&

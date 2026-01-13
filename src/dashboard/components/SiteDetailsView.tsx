@@ -185,8 +185,16 @@ export function SiteDetailsView({ onSelect }: SiteDetailsViewProps) {
             );
           })}
           {filteredSites.length === 0 && (
-            <div className="p-12 text-center text-neutral-500">
-              No sites found matching "{searchQuery}"
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                <Search className="w-8 h-8 text-primary opacity-50" />
+              </div>
+              <h3 className="text-lg font-bold text-neutral-200 mb-2">
+                No sites found
+              </h3>
+              <p className="text-neutral-500 max-w-xs mx-auto">
+                No visited sites match your search query "{searchQuery}".
+              </p>
             </div>
           )}
         </div>

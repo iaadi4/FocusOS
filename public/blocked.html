@@ -12,62 +12,82 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
-        background-color: #09090b;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: #000000;
         color: #fff;
         text-align: center;
       }
       .container {
-        max-width: 500px;
+        max-width: 480px;
         padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
       .icon {
         width: 80px;
         height: 80px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 0 0 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 40px -10px rgba(0, 0, 0, 0.5);
       }
       h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
         font-weight: 800;
         margin: 0 0 1rem;
-        background: linear-gradient(to right, #fff, #a1a1aa);
+        letter-spacing: -0.04em;
+        background: linear-gradient(to bottom right, #fff, #71717a);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        line-height: 1.1;
       }
       p {
         color: #a1a1aa;
         font-size: 1.125rem;
         line-height: 1.6;
-        margin-bottom: 2rem;
+        margin: 0;
+        font-weight: 500;
       }
       .domain-badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.5rem 1.25rem;
         border-radius: 9999px;
-        font-family: monospace;
-        color: #fff;
+        font-family: "JetBrains Mono", monospace;
+        color: #e4e4e7;
+        font-size: 0.875rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 1.5rem;
+        letter-spacing: -0.02em;
       }
-      .btn {
-        display: inline-block;
-        padding: 0.75rem 2rem;
-        background: #fff;
-        color: #000;
-        text-decoration: none;
+      .quote-container {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        width: 100%;
+        opacity: 0.8;
+      }
+      .quote-text {
+        font-family: serif;
+        font-style: italic;
+        font-size: 1.25rem;
+        color: #d4d4d8;
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+      }
+      .quote-author {
+        font-size: 0.875rem;
+        color: #71717a;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
         font-weight: 600;
-        border-radius: 0.75rem;
-        transition: opacity 0.2s;
-      }
-      .btn:hover {
-        opacity: 0.9;
       }
     </style>
   </head>
@@ -92,30 +112,6 @@
       <h1>Time's Up!</h1>
       <p>You have reached your daily limit.</p>
     </div>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const domain = params.get("domain");
-      const limitRaw = params.get("limit");
-
-      if (domain) {
-        document.getElementById("domain").textContent = domain;
-      }
-
-      if (limitRaw) {
-        const ms = parseInt(limitRaw);
-        const seconds = Math.floor((ms / 1000) % 60);
-        const minutes = Math.floor((ms / (1000 * 60)) % 60);
-        const hours = Math.floor(ms / (1000 * 60 * 60));
-
-        let timeString = "";
-        if (hours > 0) timeString += `${hours}h `;
-        if (minutes > 0 || hours > 0) timeString += `${minutes}m `;
-        if (seconds > 0 && hours === 0) timeString += `${seconds}s`; // Show seconds only if < 1h for brevity, or always? User asked "how time we reached". Let's keep it clean.
-
-        if (!timeString) timeString = "0m";
-
-        document.getElementById("limit-text").textContent = timeString.trim();
-      }
-    </script>
+    <script src="blocked.js"></script>
   </body>
 </html>

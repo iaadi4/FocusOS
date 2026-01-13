@@ -21,9 +21,18 @@ export const DailyLimitsView = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const isValidDomain = (domain: string) => {
+    // Allows localhost, IPv4, and standard domains like example.com
+    const pattern =
+      /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$|^localhost$|^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    return pattern.test(domain);
+  };
+
+  const isInvalid = Boolean(newDomain && !isValidDomain(newDomain));
+
   const handleAddDomain = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newDomain) return;
+    if (!newDomain || isInvalid) return;
 
     const domain = newDomain
       .toLowerCase()
@@ -51,27 +60,40 @@ export const DailyLimitsView = () => {
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 pb-4 pr-6 overflow-hidden relative pt-1">
+    <div className="flex-1 flex flex-col min-h-0 pb-4 pr-6 overflow-hidden relative">
       <div className="flex flex-col gap-6 mb-6 shrink-0">
-        <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+        <div className="p-8 rounded-2xl bg-white/5 border border-white/5">
           <h3 className="text-lg font-bold mb-2 text-neutral-200 flex items-center gap-2">
             <ShieldAlert className="w-5 h-5 text-primary" />
             Add Daily Limit
           </h3>
           <p className="text-sm text-neutral-400 mb-6">
-            Add a website to set a daily time limit for it.
+            Add a website to set a daily time limit for it. You will be notified
+            when you approach your limit and can choose to block access once
+            reached.
           </p>
-          <form onSubmit={handleAddDomain} className="flex gap-4">
-            <input
-              type="text"
-              value={newDomain}
-              onChange={(e) => setNewDomain(e.target.value)}
-              placeholder="e.g. facebook.com"
-              className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors placeholder:text-neutral-600"
-            />
+          <form onSubmit={handleAddDomain} className="flex gap-4 items-start">
+            <div className="flex-1 space-y-2">
+              <input
+                type="text"
+                value={newDomain}
+                onChange={(e) => setNewDomain(e.target.value)}
+                placeholder="e.g. facebook.com"
+                className={`w-full bg-black/50 border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors placeholder:text-neutral-600 ${
+                  isInvalid
+                    ? "border-red-500/50 focus:border-red-500"
+                    : "border-white/10 focus:border-primary/50"
+                }`}
+              />
+              {isInvalid && (
+                <p className="text-xs text-red-400 px-1">
+                  Please enter a valid domain (e.g., google.com)
+                </p>
+              )}
+            </div>
             <button
               type="submit"
-              disabled={!newDomain}
+              disabled={!newDomain || isInvalid}
               className="bg-primary text-primary-foreground font-bold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               Add Website
@@ -110,11 +132,20 @@ export const DailyLimitsView = () => {
           />
         ))}
         {filteredDomains.length === 0 && (
-          <div className="col-span-full py-12 text-center text-neutral-500 flex flex-col items-center gap-2">
-            <Timer className="w-8 h-8 opacity-20" />
-            {domainList.length === 0
-              ? "No daily limits set yet."
-              : "No websites found matching your search."}
+          <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <Search className="w-8 h-8 text-primary opacity-50" />
+            </div>
+            <h3 className="text-lg font-bold text-neutral-200 mb-2">
+              {domainList.length === 0
+                ? "No daily limits set"
+                : "No websites found"}
+            </h3>
+            <p className="text-neutral-500 max-w-xs mx-auto">
+              {domainList.length === 0
+                ? "Add a website above to start limiting your usage."
+                : `No limits match your search "${search}".`}
+            </p>
           </div>
         )}
       </div>
