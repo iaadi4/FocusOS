@@ -27,6 +27,7 @@ export interface Settings {
 
 export interface StorageData {
   whitelist?: string[];
+  pinnedSites?: string[];
   settings?: Settings;
   limits?: { [domain: string]: Limit };
   [dateKey: string]:

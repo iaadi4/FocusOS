@@ -25,9 +25,8 @@ import {
 } from "../utils/format";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import {
-  Calendar,
-  Clock,
   LayoutGrid,
+  Clock,
   Shield,
   Target,
   TrendingUp,
@@ -40,6 +39,7 @@ import {
   Settings as SettingsIcon,
 } from "lucide-react";
 import { SiteAnalysisView } from "./components/SiteAnalysisView";
+import { SiteDetailsView } from "./components/SiteDetailsView";
 import "../index.css";
 
 import { DailyLimitsView } from "./components/DailyLimitsView";
@@ -57,14 +57,20 @@ export function Dashboard() {
   const [whitelist, setWhitelist] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState("");
   const [view, setView] = useState<
-    "dashboard" | "whitelist" | "settings" | "site-analysis" | "limits"
+    | "dashboard"
+    | "whitelist"
+    | "settings"
+    | "site-analysis"
+    | "limits"
+    | "site-details"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get("view");
     return v === "whitelist" ||
       v === "settings" ||
       v === "site-analysis" ||
-      v === "limits"
+      v === "limits" ||
+      v === "site-details"
       ? v
       : "dashboard";
   });
@@ -197,10 +203,18 @@ export function Dashboard() {
   };
 
   const navItems = [
-    { id: "today", label: "Today", icon: Clock },
-    { id: "week", label: "Week", icon: Calendar },
-    { id: "month", label: "Month", icon: Calendar },
-    { id: "all-time", label: "All Time", icon: LayoutGrid },
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutGrid,
+      view: "dashboard",
+    },
+    {
+      id: "site-details",
+      label: "Site Details",
+      icon: BarChart3,
+      view: "site-details",
+    },
   ];
 
   const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -246,11 +260,10 @@ export function Dashboard() {
             <button
               key={item.id}
               onClick={() => {
-                setRange(item.id as TimeRange);
-                setView("dashboard");
+                setView(item.view as any);
               }}
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                range === item.id && view === "dashboard"
+                view === item.view
                   ? "bg-white/10 text-white shadow-inner"
                   : "text-neutral-400 hover:bg-white/5 hover:text-white"
               } ${isSidebarCollapsed ? "justify-center" : ""}`}
@@ -258,9 +271,7 @@ export function Dashboard() {
             >
               <item.icon
                 className={`w-5 h-5 flex-shrink-0 ${
-                  range === item.id && view === "dashboard"
-                    ? "text-primary"
-                    : ""
+                  view === item.view ? "text-primary" : ""
                 }`}
               />
               {!isSidebarCollapsed && <span>{item.label}</span>}
@@ -351,19 +362,18 @@ export function Dashboard() {
               {view === "whitelist" && "Excluded Sites"}
               {view === "site-analysis" && "Site Analysis"}
               {view === "settings" && "Settings"}
+              {view === "site-details" && "Site Details"}
             </h2>
             <p className="text-neutral-400 font-medium">
-              {view === "dashboard" &&
-                `Deep dive into your focus metrics for ${range.replace(
-                  "-",
-                  " "
-                )}.`}
+              {view === "dashboard" && `Deep dive into your focus metrics.`}
               {view === "limits" && "Set daily time limits for distractions."}
               {view === "whitelist" && "Manage websites that won't be tracked."}
               {view === "settings" &&
                 "Configure how the extension tracks your time."}
               {view === "site-analysis" &&
                 "Detailed analytics for a specific website."}
+              {view === "site-details" &&
+                "Comprehensive list of all visited sites."}
             </p>
           </div>
 
@@ -378,6 +388,26 @@ export function Dashboard() {
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
+          )}
+
+          {view === "dashboard" && (
+            <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
+              {(["today", "week", "month", "all-time"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRange(r)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    range === r
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-neutral-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {r === "all-time"
+                    ? "All Time"
+                    : r.charAt(0).toUpperCase() + r.slice(1)}
+                </button>
+              ))}
+            </div>
           )}
         </header>
 
@@ -545,11 +575,7 @@ export function Dashboard() {
                   {data.byDomain.map((site, index) => (
                     <div
                       key={site.domain}
-                      onClick={() => {
-                        setSelectedDomain(site.domain);
-                        setView("site-analysis");
-                      }}
-                      className="group flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/5 cursor-pointer"
+                      className="group flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/5"
                     >
                       <div className="flex items-center gap-4 overflow-hidden flex-1">
                         <span className="text-xs font-mono text-neutral-600 w-6 group-hover:text-primary transition-colors flex-shrink-0">
@@ -765,6 +791,14 @@ export function Dashboard() {
             onBack={() => {
               setView("dashboard");
               setSelectedDomain(null);
+            }}
+          />
+        )}
+        {view === "site-details" && (
+          <SiteDetailsView
+            onSelect={(domain) => {
+              setSelectedDomain(domain);
+              setView("site-analysis");
             }}
           />
         )}

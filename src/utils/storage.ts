@@ -77,6 +77,22 @@ export const addToWhitelist = async (domain: string): Promise<void> => {
   }
 };
 
+export const getPinnedSites = async (): Promise<string[]> => {
+  const data = await getStorageData("pinnedSites");
+  return data.pinnedSites || [];
+};
+
+export const togglePinnedSite = async (domain: string): Promise<void> => {
+  const data = await getStorageData("pinnedSites");
+  let pinnedSites = data.pinnedSites || [];
+  if (pinnedSites.includes(domain)) {
+    pinnedSites = pinnedSites.filter((d) => d !== domain);
+  } else {
+    pinnedSites.push(domain);
+  }
+  await setStorageData({ pinnedSites });
+};
+
 export const removeFromWhitelist = async (domain: string): Promise<void> => {
   const data = await getStorageData(WHITELIST_KEY);
   const whitelist = data[WHITELIST_KEY] || [];
