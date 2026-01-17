@@ -43,6 +43,7 @@ import { SiteDetailsView } from "./components/SiteDetailsView";
 import "../index.css";
 
 import { DailyLimitsView } from "./components/DailyLimitsView";
+import { PomodoroView } from "./components/PomodoroView";
 
 export function Dashboard() {
   const [range, setRange] = useState<TimeRange>("today");
@@ -63,6 +64,7 @@ export function Dashboard() {
     | "site-analysis"
     | "limits"
     | "site-details"
+    | "pomodoro"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get("view");
@@ -70,7 +72,8 @@ export function Dashboard() {
       v === "settings" ||
       v === "site-analysis" ||
       v === "limits" ||
-      v === "site-details"
+      v === "site-details" ||
+      v === "pomodoro"
       ? v
       : "dashboard";
   });
@@ -226,6 +229,12 @@ export function Dashboard() {
       icon: BarChart3,
       view: "site-details",
     },
+    {
+      id: "pomodoro",
+      label: "Pomodoro",
+      icon: Clock,
+      view: "pomodoro",
+    },
   ];
 
   const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -374,6 +383,7 @@ export function Dashboard() {
               {view === "site-analysis" && "Site Analysis"}
               {view === "settings" && "Settings"}
               {view === "site-details" && "Site Details"}
+              {view === "pomodoro" && "Pomodoro Timer"}
             </h2>
             <p className="text-neutral-400 font-medium">
               {view === "dashboard" && `Deep dive into your focus metrics.`}
@@ -385,6 +395,8 @@ export function Dashboard() {
                 "Detailed analytics for a specific website."}
               {view === "site-details" &&
                 "Comprehensive list of all visited sites."}
+              {view === "pomodoro" &&
+                "Track your focus sessions and productivity patterns."}
             </p>
           </div>
 
@@ -401,7 +413,7 @@ export function Dashboard() {
             </button>
           )}
 
-          {view === "dashboard" && (
+          {(view === "dashboard" || view === "pomodoro") && (
             <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
               {(["today", "week", "month", "all-time"] as const).map((r) => (
                 <button
@@ -445,7 +457,7 @@ export function Dashboard() {
                     ? formatDuration(
                         data.byDomain.length > 0
                           ? Math.round(data.totalTime / data.byDomain.length)
-                          : 0
+                          : 0,
                       )
                     : formatDuration(Math.round(insights.dailyAverage))}
                 </div>
@@ -538,7 +550,7 @@ export function Dashboard() {
                               | string
                               | ReadonlyArray<number | string>
                               | null
-                              | undefined
+                              | undefined,
                           ) => [formatDuration(Number(value) || 0), "Time"]}
                           contentStyle={{
                             backgroundColor: "#09090b",
@@ -611,7 +623,7 @@ export function Dashboard() {
                                 width: `${Math.min(
                                   (site.time / (data.byDomain[0]?.time || 1)) *
                                     100,
-                                  100
+                                  100,
                                 )}%`,
                               }}
                             ></div>
@@ -708,7 +720,7 @@ export function Dashboard() {
                   onChange={(e) => {
                     const val = Math.min(
                       100,
-                      Math.max(1, parseInt(e.target.value) || 1)
+                      Math.max(1, parseInt(e.target.value) || 1),
                     );
                     setTrackingDelay(val);
                   }}
@@ -813,6 +825,11 @@ export function Dashboard() {
             }}
           />
         )}
+        {view === "pomodoro" && (
+          <div className="pr-6">
+            <PomodoroView range={range} />
+          </div>
+        )}
       </main>
     </div>
   );
@@ -821,5 +838,5 @@ export function Dashboard() {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Dashboard />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

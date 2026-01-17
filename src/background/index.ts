@@ -10,6 +10,7 @@
  * - chrome.windows.onFocusChanged: Window gained/lost focus
  * - chrome.idle.onStateChanged: User went idle or returned
  * - chrome.alarms: Periodic save every 1 minute
+ * - Pomodoro timer: Tick every second when active
  */
 
 import {
@@ -20,6 +21,14 @@ import {
   getDailyUsage,
   updateNotificationState,
 } from "../utils/storage";
+import {
+  getPomodoroState,
+  savePomodoroState,
+  clearPomodoroState,
+  savePomodoroSession,
+  getPomodoroTemplates,
+} from "../utils/pomodoro-storage";
+import type { PomodoroState } from "../utils/types";
 
 // Storage keys for tracking state (prefixed with _ to avoid conflicts)
 const STORAGE_KEYS = {
@@ -183,6 +192,7 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
         const blockedUrl = chrome.runtime.getURL(
           `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
         );
+
         const [tab] = await chrome.tabs.query({
           active: true,
           currentWindow: true,
@@ -352,4 +362,204 @@ chrome.runtime.onInstalled.addListener(async () => {
   if (tab?.url) {
     await startTracking(tab.url);
   }
+
+  // Resume Pomodoro timer if one was active
+  await resumePomodoroTimer();
 });
+
+// --- Pomodoro Timer Logic ---
+
+let pomodoroInterval: NodeJS.Timeout | null = null;
+
+async function resumePomodoroTimer() {
+  const state = await getPomodoroState();
+  if (state && state.isActive && !state.isPaused) {
+    startPomodoroTick();
+  }
+}
+
+function startPomodoroTick() {
+  if (pomodoroInterval) {
+    clearInterval(pomodoroInterval);
+  }
+
+  pomodoroInterval = setInterval(async () => {
+    await tickPomodoro();
+  }, 1000);
+}
+
+function stopPomodoroTick() {
+  if (pomodoroInterval) {
+    clearInterval(pomodoroInterval);
+    pomodoroInterval = null;
+  }
+}
+
+async function tickPomodoro() {
+  const state = await getPomodoroState();
+  if (!state || !state.isActive || state.isPaused) {
+    stopPomodoroTick();
+    return;
+  }
+
+  const now = Date.now();
+  const elapsed = now - state.lastUpdateTime;
+  const newRemaining = Math.max(0, state.remainingMs - elapsed);
+
+  if (newRemaining <= 0) {
+    // Phase complete!
+    await handlePhaseComplete(state);
+  } else {
+    // Update state
+    await savePomodoroState({
+      ...state,
+      remainingMs: newRemaining,
+      lastUpdateTime: now,
+    });
+  }
+}
+
+async function handlePhaseComplete(state: PomodoroState) {
+  const templates = await getPomodoroTemplates();
+  const template = templates.find((t) => t.id === state.currentTemplateId);
+
+  if (!template) {
+    await stopPomodoro(true);
+    return;
+  }
+
+  if (state.currentPhase === "work") {
+    // Work complete, start break
+    const newCyclesCompleted = state.cyclesCompleted + 1;
+
+    chrome.notifications.create({
+      type: "basic",
+      iconUrl: "icon_white.png",
+      title: "Work Complete! 🎉",
+      message: `Great job! Time for a ${template.breakMinutes} minute break.`,
+    });
+
+    await savePomodoroState({
+      ...state,
+      currentPhase: "break",
+      remainingMs: template.breakMinutes * 60 * 1000,
+      cyclesCompleted: newCyclesCompleted,
+      lastUpdateTime: Date.now(),
+    });
+  } else {
+    // Break complete, start work
+    chrome.notifications.create({
+      type: "basic",
+      iconUrl: "icon_white.png",
+      title: "Break Over! 💪",
+      message: `Ready for another ${template.workMinutes} minutes of focus?`,
+    });
+
+    await savePomodoroState({
+      ...state,
+      currentPhase: "work",
+      remainingMs: template.workMinutes * 60 * 1000,
+      lastUpdateTime: Date.now(),
+    });
+  }
+}
+
+// Message handler for Pomodoro commands from popup
+chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+  if (message.type === "pomodoroStart") {
+    startPomodoro(message.templateId).then(() =>
+      sendResponse({ success: true }),
+    );
+    return true;
+  }
+
+  if (message.type === "pomodoroPause") {
+    pausePomodoro().then(() => sendResponse({ success: true }));
+    return true;
+  }
+
+  if (message.type === "pomodoroResume") {
+    resumePomodoro().then(() => sendResponse({ success: true }));
+    return true;
+  }
+
+  if (message.type === "pomodoroStop") {
+    stopPomodoro(true).then(() => sendResponse({ success: true }));
+    return true;
+  }
+});
+
+async function startPomodoro(templateId: string) {
+  const templates = await getPomodoroTemplates();
+  const template = templates.find((t) => t.id === templateId);
+
+  if (!template) return;
+
+  const state: PomodoroState = {
+    isActive: true,
+    isPaused: false,
+    currentPhase: "work",
+    currentTemplateId: templateId,
+    currentSessionId: `session-${Date.now()}`,
+    remainingMs: template.workMinutes * 60 * 1000,
+    cyclesCompleted: 0,
+    lastUpdateTime: Date.now(),
+    sessionStartTime: Date.now(),
+  };
+
+  await savePomodoroState(state);
+  startPomodoroTick();
+}
+
+async function pausePomodoro() {
+  const state = await getPomodoroState();
+  if (!state) return;
+
+  await savePomodoroState({
+    ...state,
+    isPaused: true,
+  });
+
+  stopPomodoroTick();
+}
+
+async function resumePomodoro() {
+  const state = await getPomodoroState();
+  if (!state) return;
+
+  await savePomodoroState({
+    ...state,
+    isPaused: false,
+    lastUpdateTime: Date.now(),
+  });
+
+  startPomodoroTick();
+}
+
+async function stopPomodoro(interrupted: boolean) {
+  const state = await getPomodoroState();
+  if (!state) return;
+
+  const templates = await getPomodoroTemplates();
+  const template = templates.find((t) => t.id === state.currentTemplateId);
+
+  if (template) {
+    await savePomodoroSession({
+      id: state.currentSessionId,
+      templateId: state.currentTemplateId,
+      templateName: template.name,
+      workMinutes: template.workMinutes,
+      breakMinutes: template.breakMinutes,
+      startTime: state.sessionStartTime || Date.now(),
+      endTime: Date.now(),
+      completedCycles: state.cyclesCompleted,
+      interrupted,
+    });
+  }
+
+  await clearPomodoroState();
+  stopPomodoroTick();
+}
+
+// Resume timer on startup
+resumePomodoroTimer();

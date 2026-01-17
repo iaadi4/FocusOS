@@ -97,3 +97,45 @@ export interface TrendMetrics {
   timeChange: number; // percentage
   visitsChange: number; // percentage
 }
+
+// Pomodoro types
+export interface PomodoroTemplate {
+  id: string;
+  name: string;
+  workMinutes: number;
+  breakMinutes: number;
+  isCustom: boolean;
+}
+
+export interface PomodoroSession {
+  id: string;
+  templateId: string;
+  templateName: string;
+  workMinutes: number;
+  breakMinutes: number;
+  startTime: number;
+  endTime?: number;
+  completedCycles: number;
+  interrupted: boolean;
+}
+
+export interface PomodoroState {
+  isActive: boolean;
+  isPaused: boolean;
+  currentPhase: "work" | "break";
+  currentTemplateId: string;
+  currentSessionId: string;
+  remainingMs: number;
+  cyclesCompleted: number;
+  lastUpdateTime: number;
+  sessionStartTime: number;
+}
+
+export interface PomodoroStats {
+  totalSessions: number;
+  totalFocusTime: number;
+  totalBreakTime: number;
+  averageSessionLength: number;
+  mostUsedTemplate: string;
+  sessionsToday: number;
+}
