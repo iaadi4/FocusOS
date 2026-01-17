@@ -15,6 +15,7 @@ import type {
   Insights,
   Settings,
 } from "./types";
+import browser from "webextension-polyfill";
 
 const WHITELIST_KEY = "whitelist";
 const SETTINGS_KEY = "settings";
@@ -51,21 +52,13 @@ export const getTodayKey = (): string => {
 export const getStorageData = async (
   keys?: string | string[] | null,
 ): Promise<StorageData> => {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(keys || null, (result) => {
-      resolve(result as StorageData);
-    });
-  });
+  return (await browser.storage.local.get(keys || null)) as StorageData;
 };
 
 export const setStorageData = async (
   data: Partial<StorageData>,
 ): Promise<void> => {
-  return new Promise((resolve) => {
-    chrome.storage.local.set(data, () => {
-      resolve();
-    });
-  });
+  await browser.storage.local.set(data);
 };
 
 export const addToWhitelist = async (domain: string): Promise<void> => {

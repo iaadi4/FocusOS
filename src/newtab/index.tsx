@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
+import browser from "webextension-polyfill";
 import { getAggregatedData } from "../utils/storage";
 import type { AggregatedData } from "../utils/types";
 import { formatDuration } from "../utils/format";
@@ -24,7 +25,7 @@ export function Sidebar() {
   }, []);
 
   const openDashboard = () => {
-    chrome.tabs.create({ url: "dashboard.html" });
+    browser.tabs.create({ url: "dashboard.html" });
   };
 
   return (
@@ -129,5 +130,5 @@ export function Sidebar() {
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Sidebar />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

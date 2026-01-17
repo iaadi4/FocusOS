@@ -5,6 +5,7 @@
  */
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
+import browser from "webextension-polyfill";
 import { getAggregatedData } from "../utils/storage";
 import {
   getPomodoroTemplates,
@@ -82,27 +83,27 @@ export function Sidebar() {
   }, []);
 
   const openDashboard = () => {
-    chrome.tabs.create({ url: "dashboard.html" });
+    browser.tabs.create({ url: "dashboard.html" });
   };
 
   // Pomodoro handlers
   const handleStartTimer = async (templateId: string) => {
-    chrome.runtime.sendMessage({ type: "pomodoroStart", templateId });
+    await browser.runtime.sendMessage({ type: "pomodoroStart", templateId });
     setTimeout(fetchPomodoroData, 100);
   };
 
   const handlePauseTimer = async () => {
-    chrome.runtime.sendMessage({ type: "pomodoroPause" });
+    await browser.runtime.sendMessage({ type: "pomodoroPause" });
     setTimeout(fetchPomodoroData, 100);
   };
 
   const handleResumeTimer = async () => {
-    chrome.runtime.sendMessage({ type: "pomodoroResume" });
+    await browser.runtime.sendMessage({ type: "pomodoroResume" });
     setTimeout(fetchPomodoroData, 100);
   };
 
   const handleStopTimer = async () => {
-    chrome.runtime.sendMessage({ type: "pomodoroStop" });
+    await browser.runtime.sendMessage({ type: "pomodoroStop" });
     setTimeout(fetchPomodoroData, 100);
   };
 
@@ -128,11 +129,7 @@ export function Sidebar() {
       <div className="px-6 py-4 flex-1 flex flex-col relative z-10">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold flex items-center gap-2 tracking-tight">
-            <img
-              src="/logo.png"
-              className="w-8 h-8 rounded-lg"
-              alt="Logo"
-            />
+            <img src="/logo.png" className="w-8 h-8 rounded-lg" alt="Logo" />
             <span>FocusOS</span>
           </h1>
           <div
@@ -168,7 +165,7 @@ export function Sidebar() {
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div className="flex-1 overflow-y-auto">
           {activeTab === "stats" ? (
             <div className="space-y-6 animate-in fade-in duration-500">
               <div className="glass-panel p-6 rounded-2xl text-center shadow-lg border-white/10 bg-white/5 relative overflow-hidden group">

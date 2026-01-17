@@ -9,6 +9,7 @@ import type {
   PomodoroStats,
 } from "./types";
 import { getStorageData, setStorageData, getTodayKey } from "./storage";
+import browser from "webextension-polyfill";
 
 const POMODORO_TEMPLATES_KEY = "pomodoroTemplates";
 const POMODORO_STATE_KEY = "pomodoroState";
@@ -97,7 +98,7 @@ export const savePomodoroState = async (
 
 // Clear Pomodoro state (when timer stops)
 export const clearPomodoroState = async (): Promise<void> => {
-  await chrome.storage.local.remove(POMODORO_STATE_KEY);
+  await browser.storage.local.remove(POMODORO_STATE_KEY);
 };
 
 // Save a completed or interrupted session

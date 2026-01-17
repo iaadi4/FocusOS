@@ -29,6 +29,7 @@ import {
   getPomodoroTemplates,
 } from "../utils/pomodoro-storage";
 import type { PomodoroState } from "../utils/types";
+import browser from "webextension-polyfill";
 
 // Storage keys for tracking state (prefixed with _ to avoid conflicts)
 const STORAGE_KEYS = {
@@ -60,6 +61,7 @@ function getDomain(url: string): string | null {
     "chrome-extension://",
     "about:",
     "edge://",
+    "moz-extension://",
   ];
 
   if (blockedPrefixes.some((prefix) => url.startsWith(prefix))) {
@@ -100,7 +102,7 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
     !usage.notifications.sent80 &&
     !is100Percent
   ) {
-    chrome.notifications.create({
+    browser.notifications.create({
       type: "basic",
       iconUrl: "logo.png",
       title: "FocusOS Alert",
@@ -110,7 +112,7 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   }
 
   if (limit.notify100 && is100Percent && !usage.notifications.sent100) {
-    chrome.notifications.create({
+    browser.notifications.create({
       type: "basic",
       iconUrl: "logo.png",
       title: "FocusOS Alert",
@@ -120,21 +122,21 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   }
 
   if (limit.blockOnLimit && is100Percent) {
-    const [tab] = await chrome.tabs.query({
+    const [tab] = await browser.tabs.query({
       active: true,
       currentWindow: true,
     });
     if (tab && tab.id && tab.url && getDomain(tab.url) === domain) {
-      const blockedUrl = chrome.runtime.getURL(
+      const blockedUrl = browser.runtime.getURL(
         `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
       );
-      chrome.tabs.update(tab.id, { url: blockedUrl });
+      browser.tabs.update(tab.id, { url: blockedUrl });
     }
   }
 }
 
 async function commitTime(): Promise<void> {
-  const data = (await chrome.storage.local.get(
+  const data = (await browser.storage.local.get(
     Object.values(STORAGE_KEYS),
   )) as TrackingState;
 
@@ -189,16 +191,16 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
     if (limit && limit.blockOnLimit) {
       const usage = await getDailyUsage(domain);
       if (usage.time >= limit.timeLimit) {
-        const blockedUrl = chrome.runtime.getURL(
+        const blockedUrl = browser.runtime.getURL(
           `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
         );
 
-        const [tab] = await chrome.tabs.query({
+        const [tab] = await browser.tabs.query({
           active: true,
           currentWindow: true,
         });
         if (tab && tab.id) {
-          chrome.tabs.update(tab.id, { url: blockedUrl });
+          browser.tabs.update(tab.id, { url: blockedUrl });
           return; // Do not start tracking if blocked
         }
       }
@@ -217,7 +219,7 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
       }
     }
 
-    await chrome.storage.local.set({
+    await browser.storage.local.set({
       [STORAGE_KEYS.CURRENT_URL]: url,
       [STORAGE_KEYS.START_TIME]: Date.now(),
       [STORAGE_KEYS.FAVICON]: getFavicon(url),
@@ -231,7 +233,7 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
  * Stops tracking by removing the start time (but keeps URL for reference).
  */
 async function stopTracking(): Promise<void> {
-  await chrome.storage.local.remove([
+  await browser.storage.local.remove([
     STORAGE_KEYS.CURRENT_URL,
     STORAGE_KEYS.START_TIME,
     STORAGE_KEYS.FAVICON,
@@ -241,11 +243,11 @@ async function stopTracking(): Promise<void> {
 // --- Event Listeners ---
 
 // User switched to a different tab
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
+browser.tabs.onActivated.addListener(async (activeInfo) => {
   await commitTime();
 
   try {
-    const tab = await chrome.tabs.get(activeInfo.tabId);
+    const tab = await browser.tabs.get(activeInfo.tabId);
     if (tab.url) {
       await startTracking(tab.url, true); // Track visit on tab switch
     }
@@ -255,7 +257,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 });
 
 // Page finished loading (navigation within same tab)
-chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
+browser.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.active && tab.url) {
     await commitTime();
     await startTracking(tab.url, true); // Track visit on navigation
@@ -263,10 +265,10 @@ chrome.tabs.onUpdated.addListener(async (_, changeInfo, tab) => {
 });
 
 // SPA Navigation (History API)
-chrome.webNavigation?.onHistoryStateUpdated?.addListener(async (details) => {
+browser.webNavigation?.onHistoryStateUpdated?.addListener(async (details) => {
   if (details.frameId === 0) {
     try {
-      const tab = await chrome.tabs.get(details.tabId);
+      const tab = await browser.tabs.get(details.tabId);
       if (tab.active) {
         await commitTime();
         await startTracking(details.url, true);
@@ -278,12 +280,12 @@ chrome.webNavigation?.onHistoryStateUpdated?.addListener(async (details) => {
 });
 
 // Window gained or lost focus
-chrome.windows.onFocusChanged.addListener(async (windowId) => {
-  if (windowId === chrome.windows.WINDOW_ID_NONE) {
+browser.windows.onFocusChanged.addListener(async (windowId) => {
+  if (windowId === browser.windows.WINDOW_ID_NONE) {
     await commitTime();
-    await chrome.storage.local.remove([STORAGE_KEYS.START_TIME]);
+    await browser.storage.local.remove([STORAGE_KEYS.START_TIME]);
   } else {
-    const [tab] = await chrome.tabs.query({ active: true, windowId });
+    const [tab] = await browser.tabs.query({ active: true, windowId });
     if (tab?.url) {
       await startTracking(tab.url);
     }
@@ -291,12 +293,12 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 // User went idle or returned
-chrome.idle.onStateChanged.addListener(async (newState) => {
+browser.idle.onStateChanged.addListener(async (newState) => {
   if (newState === "idle" || newState === "locked") {
     await commitTime();
-    await chrome.storage.local.remove([STORAGE_KEYS.START_TIME]);
+    await browser.storage.local.remove([STORAGE_KEYS.START_TIME]);
   } else if (newState === "active") {
-    const [tab] = await chrome.tabs.query({
+    const [tab] = await browser.tabs.query({
       active: true,
       lastFocusedWindow: true,
     });
@@ -307,14 +309,14 @@ chrome.idle.onStateChanged.addListener(async (newState) => {
 });
 
 // Periodic save (every 1 minute) to capture long sessions
-chrome.alarms.create("time-tracker-save", { periodInMinutes: 1 });
+browser.alarms.create("time-tracker-save", { periodInMinutes: 1 });
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
+browser.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "time-tracker-save") {
     await commitTime();
 
     // Restart the timer for ongoing tracking
-    const data = (await chrome.storage.local.get([
+    const data = (await browser.storage.local.get([
       STORAGE_KEYS.CURRENT_URL,
       STORAGE_KEYS.FAVICON,
     ])) as TrackingState;
@@ -325,7 +327,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         // Also check limits during periodic save for notifications (soft check)
         // Calculate theoretical accumulated time since start
         const startTime = (
-          (await chrome.storage.local.get(
+          (await browser.storage.local.get(
             STORAGE_KEYS.START_TIME,
           )) as TrackingState
         )._startTime;
@@ -335,7 +337,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         }
       }
 
-      await chrome.storage.local.set({
+      await browser.storage.local.set({
         [STORAGE_KEYS.START_TIME]: Date.now(),
       });
     }
@@ -343,8 +345,8 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 // Browser startup - register for tracking
-chrome.runtime.onStartup.addListener(async () => {
-  const [tab] = await chrome.tabs.query({
+browser.runtime.onStartup.addListener(async () => {
+  const [tab] = await browser.tabs.query({
     active: true,
     lastFocusedWindow: true,
   });
@@ -354,8 +356,8 @@ chrome.runtime.onStartup.addListener(async () => {
 });
 
 // Extension installed or updated
-chrome.runtime.onInstalled.addListener(async () => {
-  const [tab] = await chrome.tabs.query({
+browser.runtime.onInstalled.addListener(async () => {
+  const [tab] = await browser.tabs.query({
     active: true,
     lastFocusedWindow: true,
   });
@@ -432,7 +434,7 @@ async function handlePhaseComplete(state: PomodoroState) {
     // Work complete, start break
     const newCyclesCompleted = state.cyclesCompleted + 1;
 
-    chrome.notifications.create({
+    browser.notifications.create({
       type: "basic",
       iconUrl: "logo.png",
       title: "Work Complete! 🎉",
@@ -448,7 +450,7 @@ async function handlePhaseComplete(state: PomodoroState) {
     });
   } else {
     // Break complete, start work
-    chrome.notifications.create({
+    browser.notifications.create({
       type: "basic",
       iconUrl: "logo.png",
       title: "Break Over! 💪",
@@ -465,27 +467,25 @@ async function handlePhaseComplete(state: PomodoroState) {
 }
 
 // Message handler for Pomodoro commands from popup
-chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+browser.runtime.onMessage.addListener(async (message: any) => {
   if (message.type === "pomodoroStart") {
-    startPomodoro(message.templateId).then(() =>
-      sendResponse({ success: true }),
-    );
-    return true;
+    await startPomodoro(message.templateId);
+    return { success: true };
   }
 
   if (message.type === "pomodoroPause") {
-    pausePomodoro().then(() => sendResponse({ success: true }));
-    return true;
+    await pausePomodoro();
+    return { success: true };
   }
 
   if (message.type === "pomodoroResume") {
-    resumePomodoro().then(() => sendResponse({ success: true }));
-    return true;
+    await resumePomodoro();
+    return { success: true };
   }
 
   if (message.type === "pomodoroStop") {
-    stopPomodoro(true).then(() => sendResponse({ success: true }));
-    return true;
+    await stopPomodoro(true);
+    return { success: true };
   }
 });
 

@@ -1,7 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "FocusOS",
   "version": "1.0.0",
+  "name": "FocusOS",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{7b320d9e-1e43-4a8f-8d9b-9c7a6e5b4f81}",
+      "strict_min_version": "109.0"
+    }
+  },
   "description": "Track your web activity beautifully.",
   "permissions": [
     "tabs",
