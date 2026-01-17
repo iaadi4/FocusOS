@@ -64,33 +64,33 @@ export function PomodoroTab({
       <div className="space-y-6 animate-in fade-in duration-500">
         {/* Timer Display */}
         <div
-          className={`p-8 rounded-2xl text-center relative overflow-hidden ${
+          className={`p-5 rounded-2xl text-center relative overflow-hidden ${
             activeTimer.currentPhase === "work"
               ? "bg-primary/10 border border-primary/20"
               : "bg-emerald-500/10 border border-emerald-500/20"
           }`}
         >
           {/* Circular Progress */}
-          <div className="relative w-48 h-48 mx-auto mb-6">
+          <div className="relative w-36 h-36 mx-auto mb-4">
             <svg className="w-full h-full -rotate-90">
               <circle
-                cx="96"
-                cy="96"
-                r="88"
+                cx="72"
+                cy="72"
+                r="66"
                 stroke="currentColor"
-                strokeWidth="8"
+                strokeWidth="6"
                 fill="none"
                 className="text-white/5"
               />
               <circle
-                cx="96"
-                cy="96"
-                r="88"
+                cx="72"
+                cy="72"
+                r="66"
                 stroke="currentColor"
-                strokeWidth="8"
+                strokeWidth="6"
                 fill="none"
-                strokeDasharray={`${2 * Math.PI * 88}`}
-                strokeDashoffset={`${2 * Math.PI * 88 * (1 - progress)}`}
+                strokeDasharray={`${2 * Math.PI * 66}`}
+                strokeDashoffset={`${2 * Math.PI * 66 * (1 - progress)}`}
                 className={
                   activeTimer.currentPhase === "work"
                     ? "text-primary"
@@ -101,8 +101,8 @@ export function PomodoroTab({
             </svg>
           </div>
 
-          <div className="mb-6">
-            <div className="text-5xl font-black text-white font-mono">
+          <div className="mb-3">
+            <div className="text-4xl font-black text-white font-mono">
               {formatDuration(activeTimer.remainingMs)}
             </div>
             <div
@@ -131,15 +131,15 @@ export function PomodoroTab({
             {activeTimer.isPaused ? (
               <button
                 onClick={onResumeTimer}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-black font-bold transition-colors"
               >
-                <Play className="w-4 h-4" fill="white" />
+                <Play className="w-4 h-4" fill="currentColor" />
                 Resume
               </button>
             ) : (
               <button
                 onClick={onPauseTimer}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-black font-bold transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-black font-bold transition-colors"
               >
                 <Pause className="w-4 h-4" fill="currentColor" />
                 Pause
@@ -147,7 +147,7 @@ export function PomodoroTab({
             )}
             <button
               onClick={onStopTimer}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-neutral-700 hover:bg-neutral-600 text-white font-bold transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-700 hover:bg-neutral-600 text-white font-bold transition-colors"
             >
               <Square className="w-4 h-4" />
               Stop

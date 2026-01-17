@@ -28,22 +28,26 @@ npm run lint     # Run ESLint
 
 ```
 src/
-├── background/index.ts      # Service worker (event-driven tracking)
+├── background/index.ts      # Service worker (tracking logic, timer, notifications)
 ├── dashboard/
-│   ├── index.tsx            # Main dashboard
-│   └── components/          # UI components
-├── popup/index.tsx          # Toolbar popup
+│   ├── index.tsx            # Main dashboard (routing & layout)
+│   └── components/          # UI views (Pomodoro, Limits, Analysis, etc.)
+├── popup/
+│   ├── index.tsx            # Toolbar popup entry
+│   └── PomodoroTab.tsx      # Pomodoro timer UI
 ├── utils/
-│   ├── storage.ts           # Chrome storage API
-│   ├── types.ts             # TypeScript types
+│   ├── storage.ts           # Core storage API
+│   ├── pomodoro-storage.ts  # Pomodoro storage & stats
+│   ├── types.ts             # Shared TypeScript definitions
 │   └── format.ts            # Formatting utilities
 ```
 
 ### Key Files
 
-- **background/index.ts** - Handles tab/window events, calculates time deltas
-- **utils/storage.ts** - `saveTime()`, `getSettings()`, `getAggregatedData()`
-- **dashboard/components/** - Reusable UI: StatCard, ActivityList, DistributionChart
+- **background/index.ts** - Core logic: tracking, limits, and pomodoro timer state
+- **utils/storage.ts** - Browsing data management (`saveTime`, `getAggregatedData`)
+- **utils/pomodoro-storage.ts** - Specific storage logic for Pomodoro sessions and templates
+- **dashboard/components/** - Modular views (`PomodoroView`, `DailyLimitsView`, `SiteAnalysisView`)
 
 ## Code Style
 

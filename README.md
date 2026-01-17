@@ -8,12 +8,13 @@ A beautiful Chrome extension that tracks your time spent across all websites. Bu
 ## Features
 
 - **Real-time Tracking** - Automatically tracks time spent on every website
-- **Configurable Delay** - Set how long you need to stay on a site before tracking starts (1-100 seconds)
-- **Excluded Sites** - Add domains that shouldn't be tracked
-- **Visual Analytics** - Beautiful pie charts showing your browsing distribution
-- **Time Ranges** - View data for Today, Week, Month, or All Time
-- **Smart Metrics** - Avg Per Site (today) or Daily Average (other ranges)
-- **Dark Theme** - Sleek dark interface with red accent colors
+- **Smart Delay** - Tracking starts only after staying on a site for a set duration (apply once per day per site)
+- **Pomodoro Timer** - Integrated focus timer with customizable templates, work/break intervals, and session history
+- **Daily Limits** - Set max browsing limits for specific sites to stay productive
+- **Whitelist** - Exclude specific domains from being tracked
+- **Visual Analytics** - Beautiful charts and site-specific analysis
+- **Time Ranges** - View data for Today, Week, Month, Year, or All Time
+- **Dark Theme** - Sleek dark interface with customizable accent colors
 - **Privacy First** - All data stored locally, never sent to any server
 
 ## Installation
@@ -47,10 +48,11 @@ A beautiful Chrome extension that tracks your time spent across all websites. Bu
 
 ## Usage
 
-- **Popup Widget** - Click the extension icon to see your daily stats and top sites
-- **Full Dashboard** - Click "Full Dashboard" for detailed analytics
-- **Settings** - Configure tracking delay (seconds to wait before counting a visit)
-- **Excluded Sites** - Add domains you don't want tracked
+- **Popup Widget** - View daily stats, start Pomodoro timer, or check active session
+- **Full Dashboard** - Detailed analytics, site analysis, and limit management
+- **Pomodoro** - Dedicated focus mode with presets and custom timers
+- **Daily Limits** - Configure usage caps for distracting sites
+- **Whitelist** - Manage domains that should be ignored by the tracker
 
 ## Tech Stack
 
@@ -65,19 +67,25 @@ A beautiful Chrome extension that tracks your time spent across all websites. Bu
 
 ```
 src/
-├── background/          # Service worker for tracking
+├── background/          # Service worker for tracking & timer logic
 ├── dashboard/
 │   ├── index.tsx        # Main dashboard component
 │   └── components/      # Reusable UI components
 │       ├── StatCard.tsx
 │       ├── ActivityList.tsx
 │       ├── DistributionChart.tsx
+│       ├── PomodoroView.tsx  # Pomodoro stats & history
+│       ├── DailyLimitsView.tsx
+│       ├── SiteAnalysisView.tsx
 │       ├── WhitelistView.tsx
 │       └── SettingsView.tsx
 ├── popup/               # Toolbar popup widget
+│   ├── index.tsx
+│   └── PomodoroTab.tsx  # Popup timer interface
 ├── newtab/              # New tab page
 └── utils/
     ├── storage.ts       # Chrome storage utilities
+    ├── pomodoro-storage.ts # Pomodoro specific storage
     ├── types.ts         # TypeScript interfaces
     └── format.ts        # Time formatting utilities
 ```
