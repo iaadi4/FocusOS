@@ -1,4 +1,4 @@
-# Time Tracker
+# FocusOS
 
 A beautiful Chrome extension that tracks your time spent across all websites. Built with React, TypeScript, and Tailwind CSS.
 

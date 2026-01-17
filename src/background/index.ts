@@ -1,5 +1,5 @@
 /**
- * Time Tracker - Background Service Worker
+ * FocusOS - Background Service Worker
  *
  * This service worker tracks time spent on websites using Chrome's event-driven
  * architecture. It persists all state in chrome.storage.local to survive restarts.
@@ -102,8 +102,8 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   ) {
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "icon_white.png",
-      title: "Time Tracker Alert",
+      iconUrl: "logo.png",
+      title: "FocusOS Alert",
       message: `You have used 80% of your daily limit for ${domain}.`,
     });
     await updateNotificationState(domain, { sent80: true });
@@ -112,8 +112,8 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   if (limit.notify100 && is100Percent && !usage.notifications.sent100) {
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "icon_white.png",
-      title: "Time Tracker Alert",
+      iconUrl: "logo.png",
+      title: "FocusOS Alert",
       message: `You have reached your daily limit for ${domain}.`,
     });
     await updateNotificationState(domain, { sent100: true });
@@ -434,7 +434,7 @@ async function handlePhaseComplete(state: PomodoroState) {
 
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "icon_white.png",
+      iconUrl: "logo.png",
       title: "Work Complete! 🎉",
       message: `Great job! Time for a ${template.breakMinutes} minute break.`,
     });
@@ -450,7 +450,7 @@ async function handlePhaseComplete(state: PomodoroState) {
     // Break complete, start work
     chrome.notifications.create({
       type: "basic",
-      iconUrl: "icon_white.png",
+      iconUrl: "logo.png",
       title: "Break Over! 💪",
       message: `Ready for another ${template.workMinutes} minutes of focus?`,
     });

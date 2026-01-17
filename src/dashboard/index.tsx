@@ -1,5 +1,5 @@
 /**
- * Dashboard - Main analytics view for the Time Tracker extension
+ * Dashboard - Main analytics view for the FocusOS extension
  *
  * Views:
  * - dashboard: Shows stats, charts, and detailed activity list
@@ -254,7 +254,7 @@ export function Dashboard() {
           }`}
         >
           <img
-            src="/icon_white.png"
+            src="/logo.png"
             className="w-10 h-10 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity rounded-lg"
             alt="Logo"
             onClick={toggleSidebar}
@@ -262,7 +262,7 @@ export function Dashboard() {
           />
           {!isSidebarCollapsed && (
             <div className="overflow-hidden whitespace-nowrap">
-              <h1 className="font-bold text-xl tracking-tight">Time Tracker</h1>
+              <h1 className="font-bold text-xl tracking-tight">FocusOS</h1>
               <p className="text-xs text-neutral-500 font-medium">
                 Browsing Tracker
               </p>

@@ -129,11 +129,11 @@ export function Sidebar() {
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold flex items-center gap-2 tracking-tight">
             <img
-              src="/icon_white.png"
+              src="/logo.png"
               className="w-8 h-8 rounded-lg"
               alt="Logo"
             />
-            <span>Time Tracker</span>
+            <span>FocusOS</span>
           </h1>
           <div
             className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)]"

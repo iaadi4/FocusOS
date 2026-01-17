@@ -1,4 +1,4 @@
-# Contributing to Time Tracker
+# Contributing to FocusOS
 
 Thank you for your interest in contributing!
 
