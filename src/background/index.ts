@@ -117,7 +117,7 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
     });
     if (tab && tab.id && tab.url && getDomain(tab.url) === domain) {
       const blockedUrl = chrome.runtime.getURL(
-        `blocked.html?domain=${domain}&limit=${limit.timeLimit}`
+        `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
       );
       chrome.tabs.update(tab.id, { url: blockedUrl });
     }
@@ -126,7 +126,7 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
 
 async function commitTime(): Promise<void> {
   const data = (await chrome.storage.local.get(
-    Object.values(STORAGE_KEYS)
+    Object.values(STORAGE_KEYS),
   )) as TrackingState;
 
   if (!data._currentUrl || !data._startTime) return;
@@ -136,14 +136,37 @@ async function commitTime(): Promise<void> {
 
   // Get configurable minimum delay from settings
   const settings = await getSettings();
-  const minDuration = settings.trackingDelaySeconds * 1000;
+  const delayMs = settings.trackingDelaySeconds * 1000;
 
-  // Only save if user spent at least the configured time on the site (and less than 5 minutes per event)
-  if (domain && duration >= minDuration && duration <= 300000) {
-    await saveTime(domain, duration, data._favicon || "");
+  if (!domain) return;
+
+  // Check how many times we've visited this domain today
+  const usage = await getDailyUsage(domain);
+
+  // Check if this domain has been visited before today
+  // visitCount is already incremented before commitTime, so:
+  // - visitCount === 1: This is the FIRST navigation to this domain today -> Apply delay
+  // - visitCount > 1: This domain was visited earlier today -> NO delay
+  const hasBeenVisitedBefore = usage.visitCount > 1;
+
+  let timeToSave = duration;
+
+  // Only apply delay if this is the first time visiting this domain today
+  if (!hasBeenVisitedBefore) {
+    if (duration < delayMs) {
+      timeToSave = 0; // Didn't stay long enough
+    } else {
+      timeToSave = duration - delayMs; // Subtract the delay "cost"
+    }
+  }
+  // For subsequent visits (hasBeenVisitedBefore === true), track immediately
+
+  // Only save if there is time to save (and less than 5 minutes per event to prevent huge spikes from bugs)
+  if (timeToSave > 0 && duration <= 300000) {
+    await saveTime(domain, timeToSave, data._favicon || "");
     await checkLimits(domain);
   }
-}
+} // End commitTime
 
 /**
  * Starts tracking a new URL. Stores the URL and current timestamp.
@@ -158,7 +181,7 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
       const usage = await getDailyUsage(domain);
       if (usage.time >= limit.timeLimit) {
         const blockedUrl = chrome.runtime.getURL(
-          `blocked.html?domain=${domain}&limit=${limit.timeLimit}`
+          `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
         );
         const [tab] = await chrome.tabs.query({
           active: true,
@@ -293,7 +316,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         // Calculate theoretical accumulated time since start
         const startTime = (
           (await chrome.storage.local.get(
-            STORAGE_KEYS.START_TIME
+            STORAGE_KEYS.START_TIME,
           )) as TrackingState
         )._startTime;
         if (startTime) {

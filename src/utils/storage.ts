@@ -49,7 +49,7 @@ export const getTodayKey = (): string => {
 };
 
 export const getStorageData = async (
-  keys?: string | string[] | null
+  keys?: string | string[] | null,
 ): Promise<StorageData> => {
   return new Promise((resolve) => {
     chrome.storage.local.get(keys || null, (result) => {
@@ -59,7 +59,7 @@ export const getStorageData = async (
 };
 
 export const setStorageData = async (
-  data: Partial<StorageData>
+  data: Partial<StorageData>,
 ): Promise<void> => {
   return new Promise((resolve) => {
     chrome.storage.local.set(data, () => {
@@ -106,7 +106,7 @@ export const getSettings = async (): Promise<Settings> => {
 };
 
 export const setSettings = async (
-  settings: Partial<Settings>
+  settings: Partial<Settings>,
 ): Promise<void> => {
   const current = await getSettings();
   const updated = { ...current, ...settings };
@@ -116,7 +116,7 @@ export const setSettings = async (
 export const saveTime = async (
   domain: string,
   duration: number,
-  favicon: string
+  favicon: string,
 ) => {
   return withLock(async () => {
     if (!domain || duration <= 0) return;
@@ -147,7 +147,7 @@ export const saveTime = async (
 };
 
 export const getAggregatedData = async (
-  range: TimeRange
+  range: TimeRange,
 ): Promise<AggregatedData> => {
   const data = await getStorageData(null); // Fetch all data
   const today = new Date();
@@ -282,7 +282,7 @@ export const getInsights = async (range: TimeRange): Promise<Insights> => {
 // Increment visit count for a domain (called on navigation)
 export const incrementVisitCount = async (
   domain: string,
-  favicon: string
+  favicon: string,
 ): Promise<void> => {
   return withLock(async () => {
     const today = getTodayKey();
@@ -312,7 +312,7 @@ export const incrementVisitCount = async (
 
 // Get comprehensive analysis data for a specific site
 export const getSiteAnalysisData = async (
-  domain: string
+  domain: string,
 ): Promise<import("./types").SiteAnalysisData | null> => {
   const data = await getStorageData(null);
 
@@ -360,7 +360,7 @@ export const getSiteAnalysisData = async (
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     const dateStr = `${date.getFullYear()}-${String(
-      date.getMonth() + 1
+      date.getMonth() + 1,
     ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
     const dayEntry = dailyData.find((d) => d.date === dateStr);
@@ -388,7 +388,7 @@ export const getSiteAnalysisData = async (
 export const getTrendMetrics = async (
   domain: string,
   startDate: string,
-  endDate: string
+  endDate: string,
 ): Promise<import("./types").TrendMetrics> => {
   const data = await getStorageData(null);
 
@@ -471,7 +471,7 @@ export const getTrendMetrics = async (
 };
 
 export const getLimit = async (
-  domain: string
+  domain: string,
 ): Promise<import("./types").Limit | null> => {
   const data = await getStorageData("limits");
   const limits = data.limits || {};
@@ -480,7 +480,7 @@ export const getLimit = async (
 
 export const saveLimit = async (
   domain: string,
-  limit: import("./types").Limit | null
+  limit: import("./types").Limit | null,
 ): Promise<void> => {
   const data = await getStorageData("limits");
   const limits = data.limits || {};
@@ -496,7 +496,7 @@ export const saveLimit = async (
 
 export const updateNotificationState = async (
   domain: string,
-  state: Partial<import("./types").NotificationState>
+  state: Partial<import("./types").NotificationState>,
 ): Promise<void> => {
   return withLock(async () => {
     const today = getTodayKey();
@@ -517,9 +517,10 @@ export const updateNotificationState = async (
 };
 
 export const getDailyUsage = async (
-  domain: string
+  domain: string,
 ): Promise<{
   time: number;
+  visitCount: number;
   notifications: import("./types").NotificationState;
 }> => {
   const today = getTodayKey();
@@ -529,12 +530,14 @@ export const getDailyUsage = async (
   if (!todayData[domain]) {
     return {
       time: 0,
+      visitCount: 0,
       notifications: { sent80: false, sent100: false },
     };
   }
 
   return {
     time: todayData[domain].time,
+    visitCount: todayData[domain].visitCount || 0,
     notifications: todayData[domain].notifications || {
       sent80: false,
       sent100: false,

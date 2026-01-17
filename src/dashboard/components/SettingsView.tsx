@@ -20,8 +20,8 @@ export function SettingsView({
         </h3>
         <p className="text-sm text-neutral-400 mb-6">
           Set how many seconds you need to stay on a website before it starts
-          counting towards your tracked time. This helps filter out quick
-          visits.
+          counting towards your tracked time. This delay only applies to the
+          first visit of the day. Subsequent visits are tracked immediately.
         </p>
         <div className="flex items-center gap-4">
           <input
@@ -32,7 +32,7 @@ export function SettingsView({
             onChange={(e) => {
               const val = Math.min(
                 100,
-                Math.max(1, parseInt(e.target.value) || 1)
+                Math.max(1, parseInt(e.target.value) || 1),
               );
               onTrackingDelayChange(val);
             }}
