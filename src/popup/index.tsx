@@ -125,8 +125,8 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-full h-full p-0 bg-black text-white flex flex-col font-sans selection:bg-primary/30 overflow-hidden relative">
-      <div className="px-6 py-4 flex-1 flex flex-col relative z-10">
+    <div className="w-[400px] h-[600px] p-0 bg-black text-white flex flex-col font-sans selection:bg-primary/30 overflow-hidden relative">
+      <div className="px-6 py-4 flex-1 flex flex-col relative z-10 min-h-0">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold flex items-center gap-2 tracking-tight">
             <img src="/logo.png" className="w-8 h-8 rounded-lg" alt="Logo" />
@@ -165,7 +165,7 @@ export function Sidebar() {
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {activeTab === "stats" ? (
             <div className="space-y-6 animate-in fade-in duration-500">
               <div className="glass-panel p-6 rounded-2xl text-center shadow-lg border-white/10 bg-white/5 relative overflow-hidden group">

@@ -77,6 +77,12 @@
   }
 }
 
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
 /* Glassmorphism Utilities */
 .glass-panel {
   @apply bg-background/60 backdrop-blur-lg border border-white/10;
@@ -104,4 +110,10 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Firefox Scrollbar Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }

@@ -53,8 +53,20 @@ if (manifest.background && manifest.background.service_worker) {
   delete manifest.background.service_worker;
   // manifest.background.type should be preserved if it is 'module'
   // Firefox supports type: module for background scripts in MV3 (since 112)
-
 }
+
+// Add strict_min_version and data_collection_permissions for Firefox
+if (!manifest.browser_specific_settings) {
+  manifest.browser_specific_settings = {};
+}
+if (!manifest.browser_specific_settings.gecko) {
+  manifest.browser_specific_settings.gecko = { id: "focus-os@example.com" }; // You should replace this ID
+}
+// 112.0 supports background.type: module
+manifest.browser_specific_settings.gecko.strict_min_version = "112.0";
+// Declare no data collection
+manifest.browser_specific_settings.gecko.data_collection_permissions = { required: ["none"] };
+
 
 // Write back manifest
 fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));

@@ -21,10 +21,15 @@ const quote = QUOTES[quoteIndex];
 const container = document.querySelector(".container");
 const quoteContainer = document.createElement("div");
 quoteContainer.className = "quote-container";
-quoteContainer.innerHTML = `
-  <p class="quote-text">"${quote.text}"</p>
-  <p class="quote-author">— ${quote.author}</p>
-`;
+const quoteText = document.createElement("p");
+quoteText.className = "quote-text";
+quoteText.textContent = `"${quote.text}"`;
+quoteContainer.appendChild(quoteText);
+
+const quoteAuthor = document.createElement("p");
+quoteAuthor.className = "quote-author";
+quoteAuthor.textContent = `— ${quote.author}`;
+quoteContainer.appendChild(quoteAuthor);
 container.appendChild(quoteContainer);
 
 // Valid themes map (simplified from utils/themes.ts)
@@ -88,6 +93,13 @@ if (limitRaw) {
 
   const textP = document.querySelector("p:not(.domain-badge)");
   if (textP) {
-    textP.innerHTML = `You have reached your daily limit of <span id="limit-text" style="color: #fff; font-weight: bold;">${timeString.trim()}</span>.`;
+    textP.textContent = "You have reached your daily limit of ";
+    const limitSpan = document.createElement("span");
+    limitSpan.id = "limit-text";
+    limitSpan.style.color = "#fff";
+    limitSpan.style.fontWeight = "bold";
+    limitSpan.textContent = timeString.trim();
+    textP.appendChild(limitSpan);
+    textP.appendChild(document.createTextNode("."));
   }
 }
