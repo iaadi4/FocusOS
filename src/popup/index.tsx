@@ -10,7 +10,6 @@ import { getAggregatedData } from "../utils/storage";
 import {
   getPomodoroTemplates,
   getPomodoroState,
-  savePomodoroTemplate,
   deletePomodoroTemplate,
 } from "../utils/pomodoro-storage";
 import { formatDuration } from "../utils/format";
@@ -105,18 +104,6 @@ export function Sidebar() {
   const handleStopTimer = async () => {
     await browser.runtime.sendMessage({ type: "pomodoroStop" });
     setTimeout(fetchPomodoroData, 100);
-  };
-
-  const handleCreateCustom = async (
-    workMinutes: number,
-    breakMinutes: number,
-  ) => {
-    await savePomodoroTemplate({
-      name: `${workMinutes}+${breakMinutes}`,
-      workMinutes,
-      breakMinutes,
-    });
-    await fetchPomodoroData();
   };
 
   const handleDeleteTemplate = async (id: string) => {
@@ -232,7 +219,6 @@ export function Sidebar() {
               onPauseTimer={handlePauseTimer}
               onResumeTimer={handleResumeTimer}
               onStopTimer={handleStopTimer}
-              onCreateCustom={handleCreateCustom}
               onDeleteTemplate={handleDeleteTemplate}
             />
           )}

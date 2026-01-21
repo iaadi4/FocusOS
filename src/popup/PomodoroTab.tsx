@@ -1,5 +1,4 @@
-import React from "react";
-import { Timer, Play, Pause, Square } from "lucide-react";
+import { Timer, Play, Pause, Square, Music } from "lucide-react";
 import { formatDuration } from "../utils/format";
 import type { PomodoroTemplate, PomodoroState } from "../utils/types";
 
@@ -10,7 +9,6 @@ interface PomodoroTabProps {
   onPauseTimer: () => void;
   onResumeTimer: () => void;
   onStopTimer: () => void;
-  onCreateCustom: (workMinutes: number, breakMinutes: number) => void;
   onDeleteTemplate: (id: string) => void;
 }
 
@@ -21,18 +19,9 @@ export function PomodoroTab({
   onPauseTimer,
   onResumeTimer,
   onStopTimer,
-  onCreateCustom,
+
   onDeleteTemplate,
 }: PomodoroTabProps) {
-  const [customWork, setCustomWork] = React.useState(25);
-  const [customBreak, setCustomBreak] = React.useState(5);
-
-  const handleCreateCustom = () => {
-    onCreateCustom(customWork, customBreak);
-    setCustomWork(25);
-    setCustomBreak(5);
-  };
-
   if (activeTimer && activeTimer.isActive) {
     // Active timer display
     const progress =
@@ -223,47 +212,28 @@ export function PomodoroTab({
         </div>
       )}
 
-      {/* Create Custom */}
+      {/* Lofi Music */}
       <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-        <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">
-          Create Custom
-        </h3>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <input
-              type="number"
-              min="1"
-              max="120"
-              value={customWork}
-              onChange={(e) =>
-                setCustomWork(
-                  Math.max(1, Math.min(120, parseInt(e.target.value) || 1)),
-                )
-              }
-              className="w-16 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-center text-sm focus:outline-none focus:border-primary/50"
-            />
-            <span className="text-xs text-neutral-400">min work</span>
-            <input
-              type="number"
-              min="1"
-              max="60"
-              value={customBreak}
-              onChange={(e) =>
-                setCustomBreak(
-                  Math.max(1, Math.min(60, parseInt(e.target.value) || 1)),
-                )
-              }
-              className="w-16 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-center text-sm focus:outline-none focus:border-primary/50"
-            />
-            <span className="text-xs text-neutral-400">min break</span>
-          </div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
+            <Music className="w-3 h-3" />
+            Lofi Music
+          </h3>
           <button
-            onClick={handleCreateCustom}
-            className="w-full py-2 rounded-lg bg-primary hover:opacity-90 text-black text-sm font-bold transition-opacity"
+            onClick={() => {
+              chrome.tabs.create({
+                url: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+                active: false,
+              });
+            }}
+            className="px-3 py-1 rounded-lg text-xs font-bold transition-colors bg-primary/20 text-primary hover:bg-primary/30"
           >
-            Start Custom Timer
+            Open Player
           </button>
         </div>
+        <p className="text-xs text-neutral-500">
+          Opens 24/7 Lofi Hip Hop Radio in a new tab
+        </p>
       </div>
     </div>
   );
