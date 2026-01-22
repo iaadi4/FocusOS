@@ -59,21 +59,21 @@ export default function HeroDashboard() {
       time: "5h 30m",
       last: "1 hour ago",
       icon: <Youtube className="w-4 h-4" />,
-      color: "bg-red-500",
+      color: "bg-purple-500",
     },
     {
       name: "github.com",
       time: "2h 45m",
       last: "Just now",
       icon: <Github className="w-4 h-4" />,
-      color: "bg-zinc-100",
+      color: "bg-purple-500",
     },
     {
       name: "figma.com",
       time: "1h 20m",
       last: "Yesterday",
       icon: <Globe className="w-4 h-4" />,
-      color: "bg-orange-500",
+      color: "bg-purple-500",
     },
   ];
 

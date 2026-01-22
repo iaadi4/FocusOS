@@ -1,21 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import {
-  motion,
-  useScroll,
-  useMotionValueEvent,
-  AnimatePresence,
-} from "framer-motion";
-import {
-  Timer,
   BarChart2,
   Shield,
   Clock,
   Zap,
-  CheckCircle,
   Chrome,
-  Eye,
   Star,
   Users,
   Github,
@@ -23,9 +15,10 @@ import {
   Ghost,
   Smartphone,
   Twitter,
-  Linkedin,
-  Mail,
-  ArrowRight,
+  List,
+  Music,
+  TrendingUp,
+  MousePointer2,
 } from "lucide-react";
 import HeroDashboard from "@/components/HeroDashboard";
 import { useEffect, useState } from "react";
@@ -40,6 +33,9 @@ export default function Home() {
   const [stars, setStars] = useState<number | null>(null);
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const [browser, setBrowser] = useState<"firefox" | "chrome" | "other">(
+    "other",
+  );
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -52,7 +48,13 @@ export default function Home() {
   });
 
   useEffect(() => {
-    // Fetch Stars
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf("firefox") > -1) {
+      setBrowser("firefox");
+    } else if (userAgent.indexOf("chrome") > -1) {
+      setBrowser("chrome");
+    }
+
     fetch("https://api.github.com/repos/iaadi4/FocusOS")
       .then((res) => res.json())
       .then((data) => {
@@ -62,7 +64,6 @@ export default function Home() {
       })
       .catch((err) => console.error("Failed to fetch stars", err));
 
-    // Fetch Contributors
     fetch("https://api.github.com/repos/iaadi4/FocusOS/contributors")
       .then((res) => res.json())
       .then((data) => {
@@ -75,7 +76,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-purple-500/30 font-sans">
-      {/* Smart Navbar */}
       <motion.nav
         variants={{
           visible: { y: 0 },
@@ -85,33 +85,54 @@ export default function Home() {
         transition={{ duration: 0.35, ease: "easeInOut" }}
         className="fixed top-0 left-0 right-0 z-50 flex justify-center py-6 pointer-events-none"
       >
-        <div className="bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex items-center gap-8 shadow-2xl pointer-events-auto">
-          <div className="flex items-center gap-2 font-bold tracking-tight">
+        {/* PILL NAVBAR: Fully Black, Wider, Consolidated */}
+        <div className="bg-black border border-white/10 rounded-full px-8 py-3 flex items-center justify-between shadow-2xl pointer-events-auto w-[90%] max-w-3xl">
+          <div className="flex items-center gap-3 font-bold tracking-tight">
             <Image
               src="/icon.png"
-              width={24}
-              height={24}
+              width={32}
+              height={32}
               alt="FocusOS"
-              className="w-6 h-6 text-purple-500"
+              className="w-8 h-8 rounded-lg"
             />
-            FocusOS
+            <span className="text-lg">FocusOS</span>
           </div>
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+
+          <div className="flex items-center gap-6">
             <a
               href="https://github.com/iaadi4/FocusOS"
-              className="hover:text-white transition-colors"
+              target="_blank"
+              className="text-gray-400 hover:text-white transition-colors"
+              aria-label="GitHub"
             >
-              Github
+              <Github className="w-5 h-5" />
             </a>
+
+            {browser === "firefox" ? (
+              <a
+                href="https://addons.mozilla.org/en-US/firefox/addon/focusos/"
+                target="_blank"
+                className="bg-white/10 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-white/20 transition-colors whitespace-nowrap flex items-center gap-2 border border-white/10"
+              >
+                <Image
+                  src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg"
+                  width={20}
+                  height={20}
+                  alt="Firefox"
+                  className="w-5 h-5"
+                />
+                Download
+              </a>
+            ) : (
+              <button className="bg-white/5 text-gray-500 px-6 py-2 rounded-full text-sm font-bold cursor-not-allowed whitespace-nowrap border border-white/5">
+                Coming Soon
+              </button>
+            )}
           </div>
-          <button className="bg-white text-black px-4 py-1.5 rounded-full text-sm font-bold hover:bg-gray-200 transition-colors">
-            Coming Soon
-          </button>
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-20 px-4 overflow-hidden">
+      <section className="relative pt-48 pb-20 px-4 overflow-hidden">
         <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto text-center relative z-10">
@@ -121,48 +142,74 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="mb-16"
           >
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8">
+            <h1 className="text-5xl md:text-8xl font-black tracking-tight mb-8">
               Master Your <br />
               <span className="text-gradient">Digital Life.</span>
             </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
               Stop procrastination in its tracks. FocusOS combines powerful
               blocking, analytics, and flow-state tools into one beautiful
               dashboard.
             </p>
 
-            <div className="flex flex-col items-center justify-center gap-8 mb-16">
+            <div className="flex flex-col items-center justify-center gap-8 mb-20">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <a
+                  href="https://addons.mozilla.org/en-US/firefox/addon/focusos/"
+                  target="_blank"
+                  className="px-8 py-4 bg-white text-black rounded-xl font-bold text-lg flex items-center gap-3 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+                >
+                  <Image
+                    src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg"
+                    width={28}
+                    height={28}
+                    alt="Firefox"
+                    className="w-7 h-7"
+                  />
+                  Add to Firefox
+                </a>
+                <button className="px-8 py-4 bg-zinc-900 text-gray-400 border border-zinc-800 rounded-xl font-bold text-lg flex items-center gap-3 cursor-not-allowed opacity-70">
+                  <Chrome className="w-6 h-6" />
+                  Chrome (Coming Soon)
+                </button>
+              </div>
+
               <div className="space-y-4">
-                <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+                <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
                   <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4" />{" "}
-                    {stars !== null ? stars : "..."} stars
+                    <Star className="w-4 h-4 text-purple-500" />{" "}
+                    <span className="text-gray-300">
+                      {stars !== null ? stars : "..."} stars
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />{" "}
-                    {contributors.length > 0 ? contributors.length : "..."}{" "}
-                    contributors
+                    <Users className="w-4 h-4 text-purple-500" />{" "}
+                    <span className="text-gray-300">
+                      {contributors.length > 0 ? contributors.length : "..."}{" "}
+                      contributors
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          <HeroDashboard />
+          <div className="relative w-full max-w-6xl mx-auto">
+            <HeroDashboard />
+          </div>
         </div>
       </section>
 
-      {/* Features Section - Aesthetic Bento Grid */}
       <section
         id="features"
         className="py-32 px-4 bg-zinc-950/50 border-t border-white/5"
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24 max-w-2xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
               Everything You Need.
               <br />
-              Nothing You Don't.
+              <span className="text-purple-500">Nothing You Don't.</span>
             </h2>
             <p className="text-gray-400 text-lg">
               Built for the disciplined. A complete operating system for your
@@ -171,9 +218,8 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Feature 1 - Large */}
             <div className="md:col-span-2 p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300 group">
-              <BarChart2 className="w-10 h-10 text-white mb-6" />
+              <BarChart2 className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-2xl font-bold mb-3">Deep Analytics</h3>
               <p className="text-gray-400 leading-relaxed max-w-md">
                 Understand your habits with precision. Visualize where your time
@@ -181,28 +227,25 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Feature 2 */}
             <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
-              <Shield className="w-10 h-10 text-white mb-6" />
+              <Shield className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Smart Blocking</h3>
               <p className="text-gray-400 text-sm">
-                Eliminate distractions instantly. Set strict limits or absolute
-                blocks.
+                Automatically block sites when daily limit is reached (user can
+                set daily limits).
               </p>
             </div>
 
-            {/* Feature 3 */}
             <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
-              <Zap className="w-10 h-10 text-white mb-6" />
+              <Zap className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Flow State</h3>
               <p className="text-gray-400 text-sm">
                 Environment designed to induce and maintain deep work states.
               </p>
             </div>
 
-            {/* Feature 4 - Large */}
             <div className="md:col-span-2 p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
-              <Clock className="w-10 h-10 text-white mb-6" />
+              <Clock className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-2xl font-bold mb-3">Pomodoro Timer</h3>
               <p className="text-gray-400 leading-relaxed max-w-md">
                 Built-in focus timer with customizable intervals. Syncs
@@ -210,28 +253,39 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Feature 5 */}
             <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
-              <Ghost className="w-10 h-10 text-white mb-6" />
+              <Ghost className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Privacy First</h3>
               <p className="text-gray-400 text-sm">
                 Your data stays local. We don't track your browsing history.
               </p>
             </div>
-            {/* Feature 6 */}
             <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
-              <Lock className="w-10 h-10 text-white mb-6" />
+              <List className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Whitelist Mode</h3>
               <p className="text-gray-400 text-sm">
-                Total lockdown. Only access usage-critical applications.
+                Sites in this list are not tracked.
               </p>
             </div>
-            {/* Feature 7 */}
             <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
-              <Smartphone className="w-10 h-10 text-white mb-6" />
-              <h3 className="text-xl font-bold mb-3">Cross Sync</h3>
+              <Music className="w-10 h-10 text-purple-500 mb-6" />
+              <h3 className="text-xl font-bold mb-3">Lofi Player</h3>
               <p className="text-gray-400 text-sm">
-                (Coming Soon) Sync your meaningful limits across all devices.
+                Integrated background music to help you focus.
+              </p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+              <TrendingUp className="w-10 h-10 text-purple-500 mb-6" />
+              <h3 className="text-xl font-bold mb-3">Trend Analysis</h3>
+              <p className="text-gray-400 text-sm">
+                See how your productivity improves over time.
+              </p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+              <MousePointer2 className="w-10 h-10 text-purple-500 mb-6" />
+              <h3 className="text-xl font-bold mb-3">Site Details</h3>
+              <p className="text-gray-400 text-sm">
+                Granular control and analytics for every domain.
               </p>
             </div>
           </div>
@@ -274,7 +328,6 @@ export default function Home() {
                       />
                     ))
                 ) : (
-                  // Fallback placeholders
                   <>
                     <div className="w-6 h-6 rounded-full bg-zinc-700 border border-black" />
                     <div className="w-6 h-6 rounded-full bg-zinc-600 border border-black" />
