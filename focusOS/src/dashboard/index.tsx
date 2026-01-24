@@ -37,9 +37,13 @@ import {
   ArrowLeft,
   PanelLeft,
   Settings as SettingsIcon,
+  Download,
+  FileText,
+  File,
 } from "lucide-react";
 import { SiteAnalysisView } from "./components/SiteAnalysisView";
 import { SiteDetailsView } from "./components/SiteDetailsView";
+import { exportToCSV, exportToPDF, type ExportType } from "../utils/export";
 import "../index.css";
 
 import { DailyLimitsView } from "./components/DailyLimitsView";
@@ -214,6 +218,27 @@ export function Dashboard() {
       trackingDelaySeconds: trackingDelay,
       theme: themeId,
     });
+  };
+
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async (
+    type: "csv" | "pdf",
+    exportType: ExportType = "daily",
+  ) => {
+    setIsExporting(true);
+    try {
+      if (type === "csv") {
+        await exportToCSV(exportType);
+      } else {
+        await exportToPDF(exportType);
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Failed to export data. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const navItems = [
@@ -733,6 +758,117 @@ export function Dashboard() {
                 >
                   Save
                 </button>
+              </div>
+            </div>
+
+            <div className="p-8 rounded-2xl bg-white/5 border border-white/5 max-h-[600px] overflow-y-auto custom-scrollbar">
+              <h3 className="text-lg font-bold mb-6 text-neutral-200 flex items-center gap-2 sticky top-0 bg-[#09090b] z-10 py-2 -mt-2">
+                <Download className="w-5 h-5 text-primary" />
+                Export Data
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Daily Export */}
+                <div className="p-6 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group flex flex-col h-full">
+                  <div className="flex-1">
+                    <div className="p-3 bg-primary/10 rounded-lg w-fit mb-4 text-primary">
+                      <Activity className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-bold text-neutral-200 mb-2">
+                      Daily Activity
+                    </h4>
+                    <p className="text-xs text-neutral-400 mb-6 leading-relaxed">
+                      Get a detailed log of every website you've visited,
+                      including visit counts and timestamps.
+                    </p>
+                  </div>
+                  <div className="space-y-3 mt-auto">
+                    <button
+                      onClick={() => handleExport("csv", "daily")}
+                      disabled={isExporting}
+                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-primary" />
+                      Export CSV
+                    </button>
+                    <button
+                      onClick={() => handleExport("pdf", "daily")}
+                      disabled={isExporting}
+                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                    >
+                      <File className="w-3.5 h-3.5 text-primary" />
+                      Export PDF
+                    </button>
+                  </div>
+                </div>
+
+                {/* Site Details Export */}
+                <div className="p-6 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group flex flex-col h-full">
+                  <div className="flex-1">
+                    <div className="p-3 bg-primary/10 rounded-lg w-fit mb-4 text-primary">
+                      <BarChart3 className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-bold text-neutral-200 mb-2">
+                      Site Summaries
+                    </h4>
+                    <p className="text-xs text-neutral-400 mb-6 leading-relaxed">
+                      Aggregated statistics for all your visited sites. Total
+                      time and visit counts per domain.
+                    </p>
+                  </div>
+                  <div className="space-y-3 mt-auto">
+                    <button
+                      onClick={() => handleExport("csv", "sites")}
+                      disabled={isExporting}
+                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-primary" />
+                      Export CSV
+                    </button>
+                    <button
+                      onClick={() => handleExport("pdf", "sites")}
+                      disabled={isExporting}
+                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                    >
+                      <File className="w-3.5 h-3.5 text-primary" />
+                      Export PDF
+                    </button>
+                  </div>
+                </div>
+
+                {/* Pomodoro Export */}
+                <div className="p-6 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all group flex flex-col h-full">
+                  <div className="flex-1">
+                    <div className="p-3 bg-primary/10 rounded-lg w-fit mb-4 text-primary">
+                      <Clock className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-sm font-bold text-neutral-200 mb-2">
+                      Pomodoro Stats
+                    </h4>
+                    <p className="text-xs text-neutral-400 mb-6 leading-relaxed">
+                      Detailed history of your focus sessions, including
+                      work/break times and interruptions.
+                    </p>
+                  </div>
+                  <div className="space-y-3 mt-auto">
+                    <button
+                      onClick={() => handleExport("csv", "pomodoro")}
+                      disabled={isExporting}
+                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-primary" />
+                      Export CSV
+                    </button>
+                    <button
+                      onClick={() => handleExport("pdf", "pomodoro")}
+                      disabled={isExporting}
+                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                    >
+                      <File className="w-3.5 h-3.5 text-primary" />
+                      Export PDF
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
