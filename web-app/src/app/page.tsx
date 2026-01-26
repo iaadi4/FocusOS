@@ -19,6 +19,9 @@ import {
   Music,
   TrendingUp,
   MousePointer2,
+  Tags,
+  Award,
+  FileText,
 } from "lucide-react";
 import HeroDashboard from "@/components/HeroDashboard";
 import { useEffect, useState } from "react";
@@ -286,6 +289,27 @@ export default function Home() {
               <h3 className="text-xl font-bold mb-3">Site Details</h3>
               <p className="text-gray-400 text-sm">
                 Granular control and analytics for every domain.
+              </p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+              <Tags className="w-10 h-10 text-purple-500 mb-6" />
+              <h3 className="text-xl font-bold mb-3">Site Categorization</h3>
+              <p className="text-gray-400 text-sm">
+                Organize sites into productive, distraction, or neutral piles.
+              </p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+              <Award className="w-10 h-10 text-purple-500 mb-6" />
+              <h3 className="text-xl font-bold mb-3">Focus Score</h3>
+              <p className="text-gray-400 text-sm">
+                Real-time 0-100 score to track your digital productivity.
+              </p>
+            </div>
+            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+              <FileText className="w-10 h-10 text-purple-500 mb-6" />
+              <h3 className="text-xl font-bold mb-3">Data Export</h3>
+              <p className="text-gray-400 text-sm">
+                Export your activity data to CSV or PDF for analysis.
               </p>
             </div>
           </div>
