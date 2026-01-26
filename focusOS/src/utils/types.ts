@@ -30,11 +30,13 @@ export interface StorageData {
   pinnedSites?: string[];
   settings?: Settings;
   limits?: { [domain: string]: Limit };
+  siteCategories?: SiteCategoryMap;
   [dateKey: string]:
     | DailyData
     | string[]
     | Settings
     | { [domain: string]: Limit }
+    | SiteCategoryMap
     | undefined;
 }
 
@@ -138,4 +140,20 @@ export interface PomodoroStats {
   averageSessionLength: number;
   mostUsedTemplate: string;
   sessionsToday: number;
+}
+
+// Site Categories types
+export type SiteCategory = "productive" | "distraction" | "neutral" | "others";
+
+export interface SiteCategoryMap {
+  [domain: string]: SiteCategory;
+}
+
+export interface FocusScore {
+  score: number; // 0-100
+  productiveTime: number;
+  distractionTime: number;
+  neutralTime: number;
+  othersTime: number;
+  totalTime: number;
 }

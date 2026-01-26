@@ -248,7 +248,7 @@ export function PomodoroView({ range }: PomodoroViewProps) {
                     </td>
                     <td className="px-6 py-4 text-center">
                       {session.interrupted ? (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-primary/5 text-primary/70 border border-primary/10">
                           Interrupted
                         </span>
                       ) : (

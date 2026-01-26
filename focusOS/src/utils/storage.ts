@@ -14,11 +14,15 @@ import type {
   TimeRange,
   Insights,
   Settings,
+  SiteCategory,
+  SiteCategoryMap,
+  FocusScore,
 } from "./types";
 import browser from "webextension-polyfill";
 
 const WHITELIST_KEY = "whitelist";
 const SETTINGS_KEY = "settings";
+const SITE_CATEGORIES_KEY = "siteCategories";
 
 let _mutex = Promise.resolve();
 const withLock = async <T>(fn: () => Promise<T>): Promise<T> => {
@@ -535,5 +539,78 @@ export const getDailyUsage = async (
       sent80: false,
       sent100: false,
     },
+  };
+};
+
+// Site Categories functions
+export const getSiteCategories = async (): Promise<SiteCategoryMap> => {
+  const data = await getStorageData(SITE_CATEGORIES_KEY);
+  return (data[SITE_CATEGORIES_KEY] as SiteCategoryMap) || {};
+};
+
+export const setSiteCategory = async (
+  domain: string,
+  category: SiteCategory,
+): Promise<void> => {
+  const categories = await getSiteCategories();
+  categories[domain] = category;
+  await setStorageData({ [SITE_CATEGORIES_KEY]: categories });
+};
+
+export const removeSiteCategory = async (domain: string): Promise<void> => {
+  const categories = await getSiteCategories();
+  delete categories[domain];
+  await setStorageData({ [SITE_CATEGORIES_KEY]: categories });
+};
+
+export const getFocusScore = async (range: TimeRange): Promise<FocusScore> => {
+  const aggregatedData = await getAggregatedData(range);
+  const categories = await getSiteCategories();
+
+  let productiveTime = 0;
+  let distractionTime = 0;
+  let neutralTime = 0;
+  let othersTime = 0;
+
+  // Categorize time spent on each domain
+  aggregatedData.byDomain.forEach((site) => {
+    const category = categories[site.domain] || "others";
+    switch (category) {
+      case "productive":
+        productiveTime += site.time;
+        break;
+      case "distraction":
+        distractionTime += site.time;
+        break;
+      case "neutral":
+        neutralTime += site.time;
+        break;
+      case "others":
+        othersTime += site.time;
+        break;
+    }
+  });
+
+  const totalTime = aggregatedData.totalTime;
+
+  // Calculate focus score (0-100)
+  // Formula: score = 50 + (productiveTime * 1.0 - distractionTime * 0.5 + othersTime * 0.2) / totalTime * 50
+  let score = 50;
+  if (totalTime > 0) {
+    const weightedScore =
+      (productiveTime * 1.0 - distractionTime * 0.5 + othersTime * 0.2) /
+      totalTime;
+    score = Math.round(50 + weightedScore * 50);
+    // Clamp between 0 and 100
+    score = Math.max(0, Math.min(100, score));
+  }
+
+  return {
+    score,
+    productiveTime,
+    distractionTime,
+    neutralTime,
+    othersTime,
+    totalTime,
   };
 };

@@ -16,9 +16,15 @@ import {
   removeFromWhitelist,
   getSettings,
   setSettings,
+  getFocusScore,
 } from "../utils/storage";
 import { checkAchievements } from "../utils/achievement-checker";
-import type { TimeRange, AggregatedData, Insights } from "../utils/types";
+import type {
+  TimeRange,
+  AggregatedData,
+  Insights,
+  FocusScore,
+} from "../utils/types";
 import {
   formatDuration,
   formatDurationLong,
@@ -42,6 +48,7 @@ import {
   FileText,
   File,
   Trophy,
+  Tags,
 } from "lucide-react";
 import { SiteAnalysisView } from "./components/SiteAnalysisView";
 import { SiteDetailsView } from "./components/SiteDetailsView";
@@ -51,6 +58,7 @@ import "../index.css";
 
 import { DailyLimitsView } from "./components/DailyLimitsView";
 import { PomodoroView } from "./components/PomodoroView";
+import { SiteCategoriesView } from "./components/SiteCategoriesView";
 
 export function Dashboard() {
   const [range, setRange] = useState<TimeRange>("today");
@@ -73,6 +81,7 @@ export function Dashboard() {
     | "site-details"
     | "pomodoro"
     | "achievements"
+    | "site-categories"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get("view");
@@ -81,7 +90,8 @@ export function Dashboard() {
       v === "site-analysis" ||
       v === "limits" ||
       v === "site-details" ||
-      v === "pomodoro"
+      v === "pomodoro" ||
+      v === "site-categories"
       ? v
       : "dashboard";
   });
@@ -104,6 +114,14 @@ export function Dashboard() {
   const [trackingDelay, setTrackingDelay] = useState(15);
   const [currentThemeId, setCurrentThemeId] = useState("blue-500");
   const [currentThemeName, setCurrentThemeName] = useState("Blue");
+  const [focusScore, setFocusScore] = useState<FocusScore>({
+    score: 50,
+    productiveTime: 0,
+    distractionTime: 0,
+    neutralTime: 0,
+    othersTime: 0,
+    totalTime: 0,
+  });
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -169,9 +187,11 @@ export function Dashboard() {
     const result = await getAggregatedData(range);
     const insightsResult = await getInsights(range);
     const whitelistData = await getStorageData("whitelist");
+    const focusScoreResult = await getFocusScore(range);
     setData(result);
     setInsights(insightsResult);
     setWhitelist(whitelistData.whitelist || []);
+    setFocusScore(focusScoreResult);
   };
 
   const fetchSettings = async () => {
@@ -265,6 +285,12 @@ export function Dashboard() {
       label: "Site Details",
       icon: BarChart3,
       view: "site-details",
+    },
+    {
+      id: "site-categories",
+      label: "Site Categories",
+      icon: Tags,
+      view: "site-categories",
     },
     {
       id: "pomodoro",
@@ -440,6 +466,7 @@ export function Dashboard() {
               {view === "site-details" && "Site Details"}
               {view === "pomodoro" && "Pomodoro Timer"}
               {view === "achievements" && "Awards & Achievements"}
+              {view === "site-categories" && "Site Categories"}
             </h2>
             <p className="text-neutral-400 font-medium">
               {view === "dashboard" && `Deep dive into your focus metrics.`}
@@ -455,6 +482,8 @@ export function Dashboard() {
                 "Track your focus sessions and productivity patterns."}
               {view === "achievements" &&
                 "Track your progress, earn XP, and unlock achievements."}
+              {view === "site-categories" &&
+                "Organize sites into productive, distraction, neutral, and others."}
             </p>
           </div>
 
@@ -494,7 +523,7 @@ export function Dashboard() {
 
         {view === "dashboard" && (
           <div className="flex-1 flex flex-col min-h-0 space-y-6 pb-2 pr-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group relative overflow-hidden">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5" />
@@ -543,6 +572,59 @@ export function Dashboard() {
                 </h3>
                 <div className="text-3xl font-bold text-white tracking-tight">
                   {data.byDomain.length}
+                </div>
+              </div>
+
+              {/* Focus Score Card */}
+              <div
+                className="p-5 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/20 hover:border-primary/30 transition-all group relative overflow-hidden cursor-pointer"
+                onClick={() => setView("site-categories")}
+              >
+                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <Tags className="w-3.5 h-3.5" />
+                  Focus Score
+                </h3>
+                <div className="text-4xl font-bold text-white tracking-tight mb-2">
+                  {focusScore.score}
+                  <span className="text-lg text-neutral-400 ml-1">/100</span>
+                </div>
+                <div className="flex gap-1 mt-3">
+                  {focusScore.totalTime > 0 && (
+                    <>
+                      <div
+                        className="h-1.5 bg-primary rounded-full transition-all"
+                        style={{
+                          width: `${(focusScore.productiveTime / focusScore.totalTime) * 100}%`,
+                          opacity: 1,
+                        }}
+                        title={`Productive: ${Math.round((focusScore.productiveTime / focusScore.totalTime) * 100)}%`}
+                      />
+                      <div
+                        className="h-1.5 bg-primary rounded-full transition-all"
+                        style={{
+                          width: `${(focusScore.distractionTime / focusScore.totalTime) * 100}%`,
+                          opacity: 0.6,
+                        }}
+                        title={`Distraction: ${Math.round((focusScore.distractionTime / focusScore.totalTime) * 100)}%`}
+                      />
+                      <div
+                        className="h-1.5 bg-primary rounded-full transition-all"
+                        style={{
+                          width: `${(focusScore.neutralTime / focusScore.totalTime) * 100}%`,
+                          opacity: 0.3,
+                        }}
+                        title={`Neutral: ${Math.round((focusScore.neutralTime / focusScore.totalTime) * 100)}%`}
+                      />
+                      <div
+                        className="h-1.5 bg-primary rounded-full transition-all"
+                        style={{
+                          width: `${(focusScore.othersTime / focusScore.totalTime) * 100}%`,
+                          opacity: 0.1,
+                        }}
+                        title={`Others: ${Math.round((focusScore.othersTime / focusScore.totalTime) * 100)}%`}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -711,6 +793,12 @@ export function Dashboard() {
           </div>
         )}
 
+        {view === "site-categories" && (
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+            <SiteCategoriesView range={range} />
+          </div>
+        )}
+
         {view === "limits" && <DailyLimitsView />}
 
         {view === "whitelist" && (
@@ -770,7 +858,7 @@ export function Dashboard() {
         )}
 
         {view === "settings" && (
-          <div className="space-y-6 pr-6">
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-6 space-y-6 pb-6">
             <div className="p-8 rounded-2xl bg-white/5 border border-white/5">
               <h3 className="text-lg font-bold mb-2 text-neutral-200 flex items-center gap-2">
                 <SettingsIcon className="w-5 h-5 text-primary" />
@@ -1005,11 +1093,6 @@ export function Dashboard() {
               setView("site-analysis");
             }}
           />
-        )}
-        {view === "pomodoro" && (
-          <div className="pr-6">
-            <PomodoroView range={range} />
-          </div>
         )}
       </main>
     </div>
