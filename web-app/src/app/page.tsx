@@ -24,6 +24,7 @@ import {
   FileText,
 } from "lucide-react";
 import HeroDashboard from "@/components/HeroDashboard";
+import ParticlesBackground from "@/components/ParticlesBackground";
 import { useEffect, useState } from "react";
 
 interface Contributor {
@@ -78,7 +79,22 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-purple-500/30 font-sans">
+    <main className="min-h-screen bg-black text-white selection:bg-purple-500/30 font-sans relative overflow-hidden">
+      {/* Background Elements */}
+      <ParticlesBackground />
+
+      {/* Ambient Gradients - Top Left */}
+      <div
+        className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen animate-pulse"
+        style={{ animationDuration: "8s" }}
+      />
+
+      {/* Ambient Gradients - Bottom Right */}
+      <div className="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+
+      {/* Ambient Gradients - Center Dynamic */}
+      <div className="absolute top-[20%] left-[50%] transform -translate-x-1/2 w-[800px] h-[800px] bg-fuchsia-600/10 rounded-full blur-[150px] pointer-events-none z-0" />
+
       <motion.nav
         variants={{
           visible: { y: 0 },
@@ -89,7 +105,7 @@ export default function Home() {
         className="fixed top-0 left-0 right-0 z-50 flex justify-center py-6 pointer-events-none"
       >
         {/* PILL NAVBAR: Fully Black, Wider, Consolidated */}
-        <div className="bg-black border border-white/10 rounded-full px-8 py-3 flex items-center justify-between shadow-2xl pointer-events-auto w-[90%] max-w-3xl">
+        <div className="bg-black/80 backdrop-blur-md border border-white/10 rounded-full px-8 py-3 flex items-center justify-between shadow-2xl pointer-events-auto w-[90%] max-w-3xl">
           <div className="flex items-center gap-3 font-bold tracking-tight">
             <Image
               src="/icon.png"
@@ -135,7 +151,7 @@ export default function Home() {
         </div>
       </motion.nav>
 
-      <section className="relative pt-48 pb-20 px-4 overflow-hidden">
+      <section className="relative pt-48 pb-20 px-4 overflow-hidden z-10">
         <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto text-center relative z-10">
@@ -145,7 +161,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="mb-16"
           >
-            <h1 className="text-5xl md:text-8xl font-black tracking-tight mb-8">
+            <h1 className="text-5xl md:text-8xl font-black tracking-tight mb-8 drop-shadow-2xl">
               Master Your <br />
               <span className="text-gradient">Digital Life.</span>
             </h1>
@@ -160,7 +176,7 @@ export default function Home() {
                 <a
                   href="https://addons.mozilla.org/en-US/firefox/addon/focusos/"
                   target="_blank"
-                  className="px-8 py-4 bg-white text-black rounded-xl font-bold text-lg flex items-center gap-3 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+                  className="px-8 py-4 bg-white text-black rounded-full font-bold text-lg flex items-center gap-3 hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.15)]"
                 >
                   <Image
                     src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg"
@@ -171,7 +187,7 @@ export default function Home() {
                   />
                   Add to Firefox
                 </a>
-                <button className="px-8 py-4 bg-zinc-900 text-gray-400 border border-zinc-800 rounded-xl font-bold text-lg flex items-center gap-3 cursor-not-allowed opacity-70">
+                <button className="px-8 py-4 bg-zinc-900/80 backdrop-blur-sm text-gray-400 border border-zinc-800 rounded-full font-bold text-lg flex items-center gap-3 cursor-not-allowed opacity-70">
                   <Chrome className="w-6 h-6" />
                   Chrome (Coming Soon)
                 </button>
@@ -205,7 +221,7 @@ export default function Home() {
 
       <section
         id="features"
-        className="py-32 px-4 bg-zinc-950/50 border-t border-white/5"
+        className="relative py-32 px-4 border-t border-white/5 z-10 bg-black/40 backdrop-blur-sm"
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24 max-w-2xl mx-auto">
@@ -221,7 +237,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300 group">
+            <div className="md:col-span-2 p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 group hover:bg-zinc-900/60 backdrop-blur-md">
               <BarChart2 className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-2xl font-bold mb-3">Deep Analytics</h3>
               <p className="text-gray-400 leading-relaxed max-w-md">
@@ -230,7 +246,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Shield className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Smart Blocking</h3>
               <p className="text-gray-400 text-sm">
@@ -239,7 +255,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Zap className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Flow State</h3>
               <p className="text-gray-400 text-sm">
@@ -247,7 +263,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="md:col-span-2 p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="md:col-span-2 p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Clock className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-2xl font-bold mb-3">Pomodoro Timer</h3>
               <p className="text-gray-400 leading-relaxed max-w-md">
@@ -256,56 +272,56 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Ghost className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Privacy First</h3>
               <p className="text-gray-400 text-sm">
                 Your data stays local. We don't track your browsing history.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <List className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Whitelist Mode</h3>
               <p className="text-gray-400 text-sm">
                 Sites in this list are not tracked.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Music className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Lofi Player</h3>
               <p className="text-gray-400 text-sm">
                 Integrated background music to help you focus.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <TrendingUp className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Trend Analysis</h3>
               <p className="text-gray-400 text-sm">
                 See how your productivity improves over time.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <MousePointer2 className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Site Details</h3>
               <p className="text-gray-400 text-sm">
                 Granular control and analytics for every domain.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Tags className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Site Categorization</h3>
               <p className="text-gray-400 text-sm">
                 Organize sites into productive, distraction, or neutral piles.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <Award className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Focus Score</h3>
               <p className="text-gray-400 text-sm">
                 Real-time 0-100 score to track your digital productivity.
               </p>
             </div>
-            <div className="p-8 rounded-3xl bg-zinc-900/30 border border-white/5 hover:border-purple-500/30 transition-all duration-300">
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 hover:border-purple-500/30 transition-all duration-300 hover:bg-zinc-900/60 backdrop-blur-md">
               <FileText className="w-10 h-10 text-purple-500 mb-6" />
               <h3 className="text-xl font-bold mb-3">Data Export</h3>
               <p className="text-gray-400 text-sm">
@@ -316,7 +332,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-20 px-4 bg-zinc-950 border-t border-white/5">
+      <footer className="relative py-20 px-4 bg-zinc-950/80 backdrop-blur-md border-t border-white/5 z-10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
           <div>
             <div className="flex items-center gap-2 mb-4">
