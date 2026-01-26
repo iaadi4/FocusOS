@@ -17,6 +17,7 @@ import {
   getSettings,
   setSettings,
 } from "../utils/storage";
+import { checkAchievements } from "../utils/achievement-checker";
 import type { TimeRange, AggregatedData, Insights } from "../utils/types";
 import {
   formatDuration,
@@ -40,9 +41,11 @@ import {
   Download,
   FileText,
   File,
+  Trophy,
 } from "lucide-react";
 import { SiteAnalysisView } from "./components/SiteAnalysisView";
 import { SiteDetailsView } from "./components/SiteDetailsView";
+import { AchievementsView } from "./components/AchievementsView";
 import { exportToCSV, exportToPDF, type ExportType } from "../utils/export";
 import "../index.css";
 
@@ -69,6 +72,7 @@ export function Dashboard() {
     | "limits"
     | "site-details"
     | "pomodoro"
+    | "achievements"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get("view");
@@ -186,6 +190,10 @@ export function Dashboard() {
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 2000);
+
+    // Check for Midnight Coder achievement
+    checkAchievements("app-opened");
+
     return () => clearInterval(interval);
   }, [range]);
 
@@ -201,6 +209,10 @@ export function Dashboard() {
   const handleRemoveWhitelist = async (domain: string) => {
     await removeFromWhitelist(domain);
     await fetchData();
+    const newData = await getStorageData("whitelist");
+    if (!newData.whitelist || newData.whitelist.length === 0) {
+      await checkAchievements("whitelist-cleared");
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -260,11 +272,29 @@ export function Dashboard() {
       icon: Clock,
       view: "pomodoro",
     },
+    {
+      id: "achievements",
+      label: "Awards",
+      icon: Trophy,
+      view: "achievements",
+    },
   ];
 
   const toggleSidebar = () => setIsSidebarCollapsed(!isSidebarCollapsed);
 
   const THEME_COLORS = getThemeColors();
+
+  // Secret Achievement: The Glitch
+  const [logoClicks, setLogoClicks] = useState(0);
+  const handleLogoClick = async () => {
+    toggleSidebar();
+    const newCount = logoClicks + 1;
+    setLogoClicks(newCount);
+    if (newCount >= 5) {
+      await checkAchievements("logo-click", { count: newCount });
+      setLogoClicks(0); // Reset after trigger
+    }
+  };
 
   return (
     <div className="h-screen bg-black text-white font-sans flex relative overflow-hidden selection:bg-primary/30">
@@ -282,7 +312,7 @@ export function Dashboard() {
             src="/logo.png"
             className="w-10 h-10 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity rounded-lg"
             alt="Logo"
-            onClick={toggleSidebar}
+            onClick={handleLogoClick}
             title="Toggle Sidebar"
           />
           {!isSidebarCollapsed && (
@@ -409,6 +439,7 @@ export function Dashboard() {
               {view === "settings" && "Settings"}
               {view === "site-details" && "Site Details"}
               {view === "pomodoro" && "Pomodoro Timer"}
+              {view === "achievements" && "Awards & Achievements"}
             </h2>
             <p className="text-neutral-400 font-medium">
               {view === "dashboard" && `Deep dive into your focus metrics.`}
@@ -422,6 +453,8 @@ export function Dashboard() {
                 "Comprehensive list of all visited sites."}
               {view === "pomodoro" &&
                 "Track your focus sessions and productivity patterns."}
+              {view === "achievements" &&
+                "Track your progress, earn XP, and unlock achievements."}
             </p>
           </div>
 
@@ -663,6 +696,18 @@ export function Dashboard() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {view === "pomodoro" && (
+          <div className="pr-6">
+            <PomodoroView range={range} />
+          </div>
+        )}
+
+        {view === "achievements" && (
+          <div className="flex-1 min-h-0 overflow-y-auto pr-6 custom-scrollbar">
+            <AchievementsView />
           </div>
         )}
 

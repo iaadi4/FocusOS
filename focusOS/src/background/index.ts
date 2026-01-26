@@ -27,7 +27,10 @@ import {
   clearPomodoroState,
   savePomodoroSession,
   getPomodoroTemplates,
+  getPomodoroStats,
 } from "../utils/pomodoro-storage";
+import { checkAchievements } from "../utils/achievement-checker";
+import { getAggregatedData } from "../utils/storage";
 import type { PomodoroState } from "../utils/types";
 import browser from "webextension-polyfill";
 
@@ -315,6 +318,12 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "time-tracker-save") {
     await commitTime();
 
+    // Check time tracking achievements
+    const todayData = await getAggregatedData("today");
+    await checkAchievements("time-tracked", {
+      totalMinutes: Math.floor(todayData.totalTime / 60000),
+    });
+
     // Restart the timer for ongoing tracking
     const data = (await browser.storage.local.get([
       STORAGE_KEYS.CURRENT_URL,
@@ -448,6 +457,9 @@ async function handlePhaseComplete(state: PomodoroState) {
       cyclesCompleted: newCyclesCompleted,
       lastUpdateTime: Date.now(),
     });
+
+    // Check Work achievements (First Step)
+    await checkAchievements("pomodoro-complete", { phase: "work" });
   } else {
     // Break complete, start work
     browser.notifications.create({
@@ -463,6 +475,9 @@ async function handlePhaseComplete(state: PomodoroState) {
       remainingMs: template.workMinutes * 60 * 1000,
       lastUpdateTime: Date.now(),
     });
+
+    // Check Break achievements
+    await checkAchievements("pomodoro-complete", { phase: "break" });
   }
 }
 
@@ -554,6 +569,12 @@ async function stopPomodoro(interrupted: boolean) {
       endTime: Date.now(),
       completedCycles: state.cyclesCompleted,
       interrupted,
+    });
+
+    // Check Session Count achievements
+    const stats = await getPomodoroStats();
+    await checkAchievements("pomodoro-complete", {
+      totalSessions: stats.totalSessions,
     });
   }
 
