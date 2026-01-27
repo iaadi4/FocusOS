@@ -58,14 +58,22 @@ export function AchievementsView() {
         </h3>
 
         <div className="grid gap-3">
-          {ACHIEVEMENTS.map((achievement) => {
-            const isUnlocked = state.unlockedIds.includes(achievement.id);
-            const Icon = achievement.icon;
+          {[...ACHIEVEMENTS]
+            .sort((a, b) => {
+              const isUnlockedA = state.unlockedIds.includes(a.id);
+              const isUnlockedB = state.unlockedIds.includes(b.id);
+              if (isUnlockedA && !isUnlockedB) return -1;
+              if (!isUnlockedA && isUnlockedB) return 1;
+              return 0;
+            })
+            .map((achievement) => {
+              const isUnlocked = state.unlockedIds.includes(achievement.id);
+              const Icon = achievement.icon;
 
-            return (
-              <div
-                key={achievement.id}
-                className={`
+              return (
+                <div
+                  key={achievement.id}
+                  className={`
                   relative p-4 rounded-xl border transition-all duration-300
                   ${
                     isUnlocked
@@ -73,10 +81,10 @@ export function AchievementsView() {
                       : "bg-white/5 border-white/5 opacity-60 grayscale hover:opacity-80"
                   }
                 `}
-              >
-                <div className="flex gap-4">
-                  <div
-                    className={`
+                >
+                  <div className="flex gap-4">
+                    <div
+                      className={`
                     w-12 h-12 rounded-xl flex items-center justify-center shrink-0
                     ${
                       isUnlocked
@@ -84,41 +92,41 @@ export function AchievementsView() {
                         : "bg-white/5 text-neutral-500"
                     }
                   `}
-                  >
-                    {isUnlocked ? (
-                      <Icon className="w-6 h-6" />
-                    ) : (
-                      <Lock className="w-6 h-6" />
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                      <h4
-                        className={`font-bold text-sm ${isUnlocked ? "text-white" : "text-neutral-400"}`}
-                      >
-                        {achievement.isSecret && !isUnlocked
-                          ? "??? Secret ???"
-                          : achievement.title}
-                      </h4>
-                      {(!achievement.isSecret || isUnlocked) && (
-                        <span
-                          className={`text-xs font-mono font-bold ${isUnlocked ? "text-yellow-500" : "text-neutral-600"}`}
-                        >
-                          {achievement.xp} XP
-                        </span>
+                    >
+                      {isUnlocked ? (
+                        <Icon className="w-6 h-6" />
+                      ) : (
+                        <Lock className="w-6 h-6" />
                       )}
                     </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed">
-                      {achievement.isSecret && !isUnlocked
-                        ? "Unlock this secret achievement to reveal its details."
-                        : achievement.description}
-                    </p>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <h4
+                          className={`font-bold text-sm ${isUnlocked ? "text-white" : "text-neutral-400"}`}
+                        >
+                          {achievement.isSecret && !isUnlocked
+                            ? "??? Secret ???"
+                            : achievement.title}
+                        </h4>
+                        {(!achievement.isSecret || isUnlocked) && (
+                          <span
+                            className={`text-xs font-mono font-bold ${isUnlocked ? "text-yellow-500" : "text-neutral-600"}`}
+                          >
+                            {achievement.xp} XP
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-neutral-500 leading-relaxed">
+                        {achievement.isSecret && !isUnlocked
+                          ? "Unlock this secret achievement to reveal its details."
+                          : achievement.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </div>
     </div>

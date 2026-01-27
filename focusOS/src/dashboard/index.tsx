@@ -32,10 +32,16 @@ import {
 } from "../utils/format";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import {
+  LayoutTemplate,
   LayoutGrid,
+  Radar,
+  Layers,
+  Hourglass,
+  Trophy,
   Clock,
-  Shield,
+  ShieldCheck,
   Target,
+  Crosshair,
   TrendingUp,
   Activity,
   BarChart3,
@@ -43,11 +49,10 @@ import {
   Plus,
   ArrowLeft,
   PanelLeft,
-  Settings as SettingsIcon,
+  SlidersHorizontal,
   Download,
   FileText,
   File,
-  Trophy,
   Tags,
 } from "lucide-react";
 import { SiteAnalysisView } from "./components/SiteAnalysisView";
@@ -273,29 +278,33 @@ export function Dashboard() {
     }
   };
 
+  // ... (imports remain)
+
+  // ...
+
   const navItems = [
     {
       id: "dashboard",
       label: "Dashboard",
-      icon: LayoutGrid,
+      icon: LayoutTemplate,
       view: "dashboard",
     },
     {
       id: "site-details",
       label: "Site Details",
-      icon: BarChart3,
+      icon: Radar,
       view: "site-details",
     },
     {
       id: "site-categories",
       label: "Site Categories",
-      icon: Tags,
+      icon: Layers,
       view: "site-categories",
     },
     {
       id: "pomodoro",
       label: "Pomodoro",
-      icon: Clock,
+      icon: Hourglass,
       view: "pomodoro",
     },
     {
@@ -324,6 +333,9 @@ export function Dashboard() {
 
   return (
     <div className="h-screen bg-black text-white font-sans flex relative overflow-hidden selection:bg-primary/30">
+      {/* Ambient Background Effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-black/0 to-black/0 pointer-events-none" />
+
       <aside
         className={`${
           isSidebarCollapsed ? "w-20 px-2" : "w-72 px-4"
@@ -363,16 +375,21 @@ export function Dashboard() {
               onClick={() => {
                 setView(item.view as any);
               }}
-              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              className={`flex items-center gap-3 text-sm font-semibold transition-all duration-200 group ${
+                isSidebarCollapsed
+                  ? "w-10 h-10 justify-center p-0 rounded-lg mx-auto"
+                  : "w-full px-3 py-3 rounded-xl"
+              } ${
                 view === item.view
-                  ? "bg-white/10 text-white shadow-inner"
-                  : "text-neutral-400 hover:bg-white/5 hover:text-white"
-              } ${isSidebarCollapsed ? "justify-center" : ""}`}
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_-3px_hsl(var(--primary)/0.2)]"
+                  : "text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent"
+              }`}
               title={isSidebarCollapsed ? item.label : ""}
             >
               <item.icon
-                className={`w-5 h-5 flex-shrink-0 ${
-                  view === item.view ? "text-primary" : ""
+                strokeWidth={1.5}
+                className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                  view === item.view ? "text-primary" : "group-hover:text-white"
                 }`}
               />
               {!isSidebarCollapsed && <span>{item.label}</span>}
@@ -388,48 +405,63 @@ export function Dashboard() {
           )}
           <button
             onClick={() => setView("limits")}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            className={`flex items-center gap-3 text-sm font-semibold transition-all duration-200 group ${
+              isSidebarCollapsed
+                ? "w-10 h-10 justify-center p-0 rounded-lg mx-auto"
+                : "w-full px-3 py-3 rounded-xl"
+            } ${
               view === "limits"
-                ? "bg-white/10 text-white shadow-inner"
-                : "text-neutral-400 hover:bg-white/5 hover:text-white"
-            } ${isSidebarCollapsed ? "justify-center" : ""}`}
+                ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_-3px_hsl(var(--primary)/0.2)]"
+                : "text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent"
+            }`}
             title={isSidebarCollapsed ? "Daily Limits" : ""}
           >
-            <Target
-              className={`w-5 h-5 flex-shrink-0 ${
-                view === "limits" ? "text-primary" : ""
+            <Crosshair
+              strokeWidth={1.5}
+              className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                view === "limits" ? "text-primary" : "group-hover:text-white"
               }`}
             />
             {!isSidebarCollapsed && <span>Daily Limits</span>}
           </button>
           <button
             onClick={() => setView("whitelist")}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            className={`flex items-center gap-3 text-sm font-semibold transition-all duration-200 group ${
+              isSidebarCollapsed
+                ? "w-10 h-10 justify-center p-0 rounded-lg mx-auto"
+                : "w-full px-3 py-3 rounded-xl"
+            } ${
               view === "whitelist"
-                ? "bg-white/10 text-white shadow-inner"
-                : "text-neutral-400 hover:bg-white/5 hover:text-white"
-            } ${isSidebarCollapsed ? "justify-center" : ""}`}
+                ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_-3px_hsl(var(--primary)/0.2)]"
+                : "text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent"
+            }`}
             title={isSidebarCollapsed ? "Whitelist" : ""}
           >
-            <Shield
-              className={`w-5 h-5 flex-shrink-0 ${
-                view === "whitelist" ? "text-primary" : ""
+            <ShieldCheck
+              strokeWidth={1.5}
+              className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                view === "whitelist" ? "text-primary" : "group-hover:text-white"
               }`}
             />
             {!isSidebarCollapsed && <span>Whitelist</span>}
           </button>
           <button
             onClick={() => setView("settings")}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            className={`flex items-center gap-3 text-sm font-semibold transition-all duration-200 group ${
+              isSidebarCollapsed
+                ? "w-10 h-10 justify-center p-0 rounded-lg mx-auto"
+                : "w-full px-3 py-3 rounded-xl"
+            } ${
               view === "settings"
-                ? "bg-white/10 text-white shadow-inner"
-                : "text-neutral-400 hover:bg-white/5 hover:text-white"
-            } ${isSidebarCollapsed ? "justify-center" : ""}`}
+                ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_-3px_hsl(var(--primary)/0.2)]"
+                : "text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent"
+            }`}
             title={isSidebarCollapsed ? "Settings" : ""}
           >
-            <SettingsIcon
-              className={`w-5 h-5 flex-shrink-0 ${
-                view === "settings" ? "text-primary" : ""
+            <SlidersHorizontal
+              strokeWidth={1.5}
+              className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                view === "settings" ? "text-primary" : "group-hover:text-white"
               }`}
             />
             {!isSidebarCollapsed && <span>Settings</span>}
@@ -438,14 +470,15 @@ export function Dashboard() {
 
         <button
           onClick={toggleSidebar}
-          className={`mt-auto w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+          className={`mt-auto flex items-center gap-3 text-sm font-semibold transition-all duration-200 ${
             isSidebarCollapsed
-              ? "justify-center text-primary hover:bg-white/5"
-              : "text-neutral-400 hover:bg-white/5 hover:text-white"
+              ? "w-10 h-10 justify-center p-0 rounded-lg text-primary hover:bg-white/5"
+              : "w-full px-3 py-3 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-white"
           }`}
           title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
           <PanelLeft
+            strokeWidth={1.5}
             className={`w-5 h-5 flex-shrink-0 ${
               isSidebarCollapsed ? "text-primary" : ""
             }`}
@@ -524,9 +557,9 @@ export function Dashboard() {
         {view === "dashboard" && (
           <div className="flex-1 flex flex-col min-h-0 space-y-6 pb-2 pr-6 animate-fade-in">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:0ms]">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] group relative overflow-hidden animate-slide-up [animation-delay:0ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5" />
+                  <Clock strokeWidth={1.5} className="w-3.5 h-3.5" />
                   Total Browsing
                 </h3>
                 <div className="text-3xl font-bold text-white tracking-tight">
@@ -534,9 +567,9 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:100ms]">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] group relative overflow-hidden animate-slide-up [animation-delay:100ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Activity className="w-3.5 h-3.5" />
+                  <Activity strokeWidth={1.5} className="w-3.5 h-3.5" />
                   {range === "today" ? "Avg Per Site" : "Daily Average"}
                 </h3>
                 <div className="text-3xl font-bold text-white tracking-tight">
@@ -550,24 +583,26 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:200ms]">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] group relative overflow-hidden animate-slide-up [animation-delay:200ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Target className="w-3.5 h-3.5" />
+                  <Target strokeWidth={1.5} className="w-3.5 h-3.5" />
                   Most Visited
                 </h3>
                 <div className="text-xl font-bold truncate text-white">
-                  {formatDomain(data.byDomain[0]?.domain || "-")}
+                  {data.byDomain[0]
+                    ? formatDomain(data.byDomain[0].domain)
+                    : "No Data"}
                 </div>
                 <div className="text-xs text-neutral-400 mt-1 font-mono">
                   {data.byDomain[0]
-                    ? formatDuration(data.byDomain[0].time)
-                    : ""}
+                    ? formatDuration(data.byDomain[0].time) // keep formatDuration logic for non-empty
+                    : "Start browsing"}
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:300ms]">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] group relative overflow-hidden animate-slide-up [animation-delay:300ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <TrendingUp className="w-3.5 h-3.5" />
+                  <TrendingUp strokeWidth={1.5} className="w-3.5 h-3.5" />
                   Unique Sites
                 </h3>
                 <div className="text-3xl font-bold text-white tracking-tight">
@@ -577,11 +612,11 @@ export function Dashboard() {
 
               {/* Focus Score Card */}
               <div
-                className="p-5 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/20 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group relative overflow-hidden cursor-pointer animate-slide-up [animation-delay:400ms]"
+                className="p-5 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.4)] group relative overflow-hidden cursor-pointer animate-slide-up [animation-delay:400ms]"
                 onClick={() => setView("site-categories")}
               >
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Tags className="w-3.5 h-3.5" />
+                  <Tags strokeWidth={1.5} className="w-3.5 h-3.5" />
                   Focus Score
                 </h3>
                 <div className="text-4xl font-bold text-white tracking-tight mb-2">
@@ -633,7 +668,7 @@ export function Dashboard() {
               <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/10 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-xl bg-primary/20 text-primary">
-                    <BarChart3 className="w-6 h-6" />
+                    <BarChart3 strokeWidth={1.5} className="w-6 h-6" />
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-primary/80">
@@ -653,131 +688,152 @@ export function Dashboard() {
               </div>
             )}
 
-            <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col relative overflow-hidden h-full">
-                <h3 className="text-lg font-bold mb-6 text-neutral-200">
-                  Distribution
-                </h3>
-                <div className="flex-1 min-h-[250px] relative z-10 flex items-center gap-4">
-                  <div className="w-2/3 h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={data.byDomain.slice(0, 8).map((d) => ({
-                            ...d,
-                            domain: formatDomain(d.domain),
-                          }))}
-                          dataKey="time"
-                          nameKey="domain"
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={70}
-                          outerRadius={100}
-                          paddingAngle={5}
-                          stroke="none"
-                        >
-                          {data.byDomain.slice(0, 8).map((_, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={THEME_COLORS[index % THEME_COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(
-                            value:
-                              | number
-                              | string
-                              | ReadonlyArray<number | string>
-                              | null
-                              | undefined,
-                          ) => [formatDuration(Number(value) || 0), "Time"]}
-                          contentStyle={{
-                            backgroundColor: "#09090b",
-                            borderColor: "rgba(255,255,255,0.1)",
-                            borderRadius: "12px",
-                            color: "#fff",
-                          }}
-                          itemStyle={{ color: "#e4e4e7" }}
-                          cursor={{ fill: "transparent" }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
+            {data.byDomain.length > 0 ? (
+              <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col relative overflow-hidden h-full">
+                  <h3 className="text-lg font-bold mb-6 text-neutral-200">
+                    Distribution
+                  </h3>
+                  <div className="flex-1 min-h-[250px] relative z-10 flex items-center gap-4">
+                    <div className="w-2/3 h-[250px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={data.byDomain.slice(0, 8).map((d) => ({
+                              ...d,
+                              domain: formatDomain(d.domain),
+                            }))}
+                            dataKey="time"
+                            nameKey="domain"
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={70}
+                            outerRadius={100}
+                            paddingAngle={5}
+                            stroke="none"
+                          >
+                            {data.byDomain.slice(0, 8).map((_, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={THEME_COLORS[index % THEME_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(
+                              value:
+                                | number
+                                | string
+                                | ReadonlyArray<number | string>
+                                | null
+                                | undefined,
+                            ) => [formatDuration(Number(value) || 0), "Time"]}
+                            contentStyle={{
+                              backgroundColor: "#09090b",
+                              borderColor: "rgba(255,255,255,0.1)",
+                              borderRadius: "12px",
+                              color: "#fff",
+                            }}
+                            itemStyle={{ color: "#e4e4e7" }}
+                            cursor={{ fill: "transparent" }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
 
-                  <div className="w-1/3 max-h-full overflow-y-auto custom-scrollbar pr-2 space-y-3">
-                    {data.byDomain.slice(0, 8).map((d, i) => (
-                      <div
-                        key={d.domain}
-                        className="flex items-center gap-2 text-xs"
-                      >
+                    <div className="w-1/3 max-h-full overflow-y-auto custom-scrollbar pr-2 space-y-3">
+                      {data.byDomain.slice(0, 8).map((d, i) => (
                         <div
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{
-                            backgroundColor:
-                              THEME_COLORS[i % THEME_COLORS.length],
-                          }}
-                        ></div>
-                        <span
-                          className="truncate text-neutral-300 font-medium"
-                          title={d.domain}
+                          key={d.domain}
+                          className="flex items-center gap-2 text-xs"
                         >
-                          {formatDomain(d.domain)}
+                          <div
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{
+                              backgroundColor:
+                                THEME_COLORS[i % THEME_COLORS.length],
+                            }}
+                          ></div>
+                          <span
+                            className="truncate text-neutral-300 font-medium"
+                            title={d.domain}
+                          >
+                            {formatDomain(d.domain)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col h-full overflow-hidden">
+                  <h3 className="text-lg font-bold mb-6 text-neutral-200 flex-shrink-0">
+                    Detailed Activity
+                  </h3>
+                  <div className="flex-1 overflow-y-scroll pr-2 space-y-3">
+                    {data.byDomain.map((site, index) => (
+                      <div
+                        key={site.domain}
+                        className="group flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/5"
+                      >
+                        <div className="flex items-center gap-4 overflow-hidden flex-1">
+                          <span className="text-xs font-mono text-neutral-600 w-6 group-hover:text-primary transition-colors flex-shrink-0">
+                            {index + 1}
+                          </span>
+                          <img
+                            src={
+                              site.favicon ||
+                              `https://www.google.com/s2/favicons?domain=${site.domain}`
+                            }
+                            className="w-8 h-8 rounded-lg bg-black/50 p-1 opacity-70 group-hover:opacity-100 transition-all grayscale group-hover:grayscale-0 flex-shrink-0"
+                            alt=""
+                          />
+                          <div className="flex flex-col overflow-hidden flex-1 min-w-0">
+                            <span className="truncate font-semibold text-sm text-neutral-300 group-hover:text-white transition-colors">
+                              {formatDomain(site.domain)}
+                            </span>
+                            <div className="h-1.5 w-full bg-neutral-800 rounded-full mt-2 overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all"
+                                style={{
+                                  width: `${Math.min(
+                                    (site.time /
+                                      (data.byDomain[0]?.time || 1)) *
+                                      100,
+                                    100,
+                                  )}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-sm font-mono font-bold text-neutral-500 group-hover:text-primary transition-colors whitespace-nowrap ml-4">
+                          {formatDurationLong(site.time)}
                         </span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col h-full overflow-hidden">
-                <h3 className="text-lg font-bold mb-6 text-neutral-200 flex-shrink-0">
-                  Detailed Activity
-                </h3>
-                <div className="flex-1 overflow-y-scroll pr-2 space-y-3">
-                  {data.byDomain.map((site, index) => (
-                    <div
-                      key={site.domain}
-                      className="group flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/5"
-                    >
-                      <div className="flex items-center gap-4 overflow-hidden flex-1">
-                        <span className="text-xs font-mono text-neutral-600 w-6 group-hover:text-primary transition-colors flex-shrink-0">
-                          {index + 1}
-                        </span>
-                        <img
-                          src={
-                            site.favicon ||
-                            `https://www.google.com/s2/favicons?domain=${site.domain}`
-                          }
-                          className="w-8 h-8 rounded-lg bg-black/50 p-1 opacity-70 group-hover:opacity-100 transition-all grayscale group-hover:grayscale-0 flex-shrink-0"
-                          alt=""
-                        />
-                        <div className="flex flex-col overflow-hidden flex-1 min-w-0">
-                          <span className="truncate font-semibold text-sm text-neutral-300 group-hover:text-white transition-colors">
-                            {formatDomain(site.domain)}
-                          </span>
-                          <div className="h-1.5 w-full bg-neutral-800 rounded-full mt-2 overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all"
-                              style={{
-                                width: `${Math.min(
-                                  (site.time / (data.byDomain[0]?.time || 1)) *
-                                    100,
-                                  100,
-                                )}%`,
-                              }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-sm font-mono font-bold text-neutral-500 group-hover:text-primary transition-colors whitespace-nowrap ml-4">
-                        {formatDurationLong(site.time)}
-                      </span>
-                    </div>
-                  ))}
+            ) : (
+              <div className="flex-1 min-h-0 flex flex-col items-center justify-center text-center p-12 rounded-2xl bg-white/5 border border-white/5 border-dashed">
+                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 animate-pulse">
+                  <Activity
+                    className="w-10 h-10 text-primary"
+                    style={{
+                      filter: "drop-shadow(0 0 8px hsl(var(--primary) / 0.5))",
+                    }}
+                  />
                 </div>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  No Activity Recorded
+                </h3>
+                <p className="text-neutral-400 max-w-sm">
+                  Start browsing the web to see your detailed analytics and
+                  insights appear here.
+                </p>
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -805,7 +861,7 @@ export function Dashboard() {
           <div className="space-y-6 pr-6">
             <div className="p-8 rounded-2xl bg-white/5 border border-white/5">
               <h3 className="text-lg font-bold mb-2 text-neutral-200 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" />
+                <ShieldCheck className="w-5 h-5 text-primary" />
                 Excluded Domains
               </h3>
               <p className="text-sm text-neutral-400 mb-6">
@@ -861,7 +917,7 @@ export function Dashboard() {
           <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-6 space-y-6 pb-6">
             <div className="p-8 rounded-2xl bg-white/5 border border-white/5">
               <h3 className="text-lg font-bold mb-2 text-neutral-200 flex items-center gap-2">
-                <SettingsIcon className="w-5 h-5 text-primary" />
+                <SlidersHorizontal className="w-5 h-5 text-primary" />
                 Tracking Delay
               </h3>
               <p className="text-sm text-neutral-400 mb-6">

@@ -128,15 +128,19 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
     return matchesSearch && matchesCategory;
   });
 
-  const categoryCounts = {
-    productive: sites.filter((s) => categories[s.domain] === "productive")
-      .length,
-    distraction: sites.filter((s) => categories[s.domain] === "distraction")
-      .length,
-    neutral: sites.filter((s) => categories[s.domain] === "neutral").length,
-    others: sites.filter(
-      (s) => !categories[s.domain] || categories[s.domain] === "others",
-    ).length,
+  const categoryTimes = {
+    productive: sites
+      .filter((s) => categories[s.domain] === "productive")
+      .reduce((acc, s) => acc + s.time, 0),
+    distraction: sites
+      .filter((s) => categories[s.domain] === "distraction")
+      .reduce((acc, s) => acc + s.time, 0),
+    neutral: sites
+      .filter((s) => categories[s.domain] === "neutral")
+      .reduce((acc, s) => acc + s.time, 0),
+    others: sites
+      .filter((s) => !categories[s.domain] || categories[s.domain] === "others")
+      .reduce((acc, s) => acc + s.time, 0),
   };
 
   return (
@@ -152,10 +156,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
           <div>
             <div className="text-xl font-bold text-white">
-              {categoryCounts.productive}
+              {formatDuration(categoryTimes.productive)}
             </div>
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider">
-              sites
+              browsed
             </div>
           </div>
         </div>
@@ -169,10 +173,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
           <div>
             <div className="text-xl font-bold text-white">
-              {categoryCounts.distraction}
+              {formatDuration(categoryTimes.distraction)}
             </div>
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider">
-              sites
+              browsed
             </div>
           </div>
         </div>
@@ -186,10 +190,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
           <div>
             <div className="text-xl font-bold text-white">
-              {categoryCounts.neutral}
+              {formatDuration(categoryTimes.neutral)}
             </div>
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider">
-              sites
+              browsed
             </div>
           </div>
         </div>
@@ -203,10 +207,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
           <div>
             <div className="text-xl font-bold text-white">
-              {categoryCounts.others}
+              {formatDuration(categoryTimes.others)}
             </div>
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider">
-              sites
+              browsed
             </div>
           </div>
         </div>

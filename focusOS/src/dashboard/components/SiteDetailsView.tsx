@@ -20,7 +20,7 @@ export function SiteDetailsView({ onSelect }: SiteDetailsViewProps) {
   const [pinnedSites, setPinnedSites] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<"time" | "visits" | "lastVisited">(
-    "time"
+    "time",
   );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
@@ -45,7 +45,7 @@ export function SiteDetailsView({ onSelect }: SiteDetailsViewProps) {
 
   const filteredSites = data.byDomain
     .filter((site) =>
-      site.domain.toLowerCase().includes(searchQuery.toLowerCase())
+      site.domain.toLowerCase().includes(searchQuery.toLowerCase()),
     )
     .sort((a, b) => {
       // Pinned sites always on top
@@ -134,10 +134,10 @@ export function SiteDetailsView({ onSelect }: SiteDetailsViewProps) {
                 } ${isPinned ? "bg-primary/5" : ""}`}
                 onClick={() => onSelect?.(site.domain)}
               >
-                <div className="w-8 flex justify-center">
+                <div className="w-8 flex justify-center mr-3">
                   <button
                     onClick={(e) => handleTogglePin(site.domain, e)}
-                    className={`p-1.5 rounded-lg transition-colors ${
+                    className={`p-1 rounded-lg transition-colors ${
                       isPinned
                         ? "text-primary bg-primary/20 hover:bg-primary/30"
                         : "text-neutral-600 hover:text-white hover:bg-white/10 opacity-0 group-hover:opacity-100"
