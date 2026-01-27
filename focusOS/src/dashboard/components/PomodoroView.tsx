@@ -24,7 +24,7 @@ export function PomodoroView({ range }: PomodoroViewProps) {
         getPomodoroSessions(),
       ]);
       setStats(statsData);
-      setSessions(sessionsData.slice(0, 50)); // Show last 50 sessions
+      setSessions(sessionsData); // Store all sessions for client-side filtering
       setLoading(false);
     };
 
@@ -180,12 +180,14 @@ export function PomodoroView({ range }: PomodoroViewProps) {
       {/* Session History */}
       <div>
         <h3 className="text-xl font-bold text-white mb-4">Session History</h3>
-        {sessions.length === 0 ? (
+        {filteredSessions.length === 0 ? (
           <div className="p-12 rounded-2xl bg-white/5 border border-white/5 text-center">
             <Timer className="w-12 h-12 text-neutral-600 mx-auto mb-4" />
-            <div className="text-neutral-400 mb-2">No sessions yet</div>
+            <div className="text-neutral-400 mb-2">
+              No sessions found in this range
+            </div>
             <div className="text-sm text-neutral-500">
-              Start a Pomodoro timer from the popup to begin tracking
+              Try selecting a different time range or start a new timer
             </div>
           </div>
         ) : (
@@ -211,7 +213,7 @@ export function PomodoroView({ range }: PomodoroViewProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {sessions.map((session) => (
+                {filteredSessions.map((session) => (
                   <tr
                     key={session.id}
                     className="hover:bg-white/5 transition-colors"
