@@ -522,9 +522,9 @@ export function Dashboard() {
         </header>
 
         {view === "dashboard" && (
-          <div className="flex-1 flex flex-col min-h-0 space-y-6 pb-2 pr-6">
+          <div className="flex-1 flex flex-col min-h-0 space-y-6 pb-2 pr-6 animate-fade-in">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group relative overflow-hidden">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:0ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5" />
                   Total Browsing
@@ -534,7 +534,7 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group relative overflow-hidden">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:100ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Activity className="w-3.5 h-3.5" />
                   {range === "today" ? "Avg Per Site" : "Daily Average"}
@@ -550,7 +550,7 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group relative overflow-hidden">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:200ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Target className="w-3.5 h-3.5" />
                   Most Visited
@@ -565,7 +565,7 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group relative overflow-hidden">
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-white/20 group relative overflow-hidden animate-slide-up [animation-delay:300ms]">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
                   <TrendingUp className="w-3.5 h-3.5" />
                   Unique Sites
@@ -577,7 +577,7 @@ export function Dashboard() {
 
               {/* Focus Score Card */}
               <div
-                className="p-5 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/20 hover:border-primary/30 transition-all group relative overflow-hidden cursor-pointer"
+                className="p-5 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/20 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group relative overflow-hidden cursor-pointer animate-slide-up [animation-delay:400ms]"
                 onClick={() => setView("site-categories")}
               >
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
@@ -592,7 +592,7 @@ export function Dashboard() {
                   {focusScore.totalTime > 0 && (
                     <>
                       <div
-                        className="h-1.5 bg-primary rounded-full transition-all"
+                        className="h-1.5 bg-primary rounded-full transition-all duration-1000 ease-out"
                         style={{
                           width: `${(focusScore.productiveTime / focusScore.totalTime) * 100}%`,
                           opacity: 1,
@@ -600,7 +600,7 @@ export function Dashboard() {
                         title={`Productive: ${Math.round((focusScore.productiveTime / focusScore.totalTime) * 100)}%`}
                       />
                       <div
-                        className="h-1.5 bg-primary rounded-full transition-all"
+                        className="h-1.5 bg-primary rounded-full transition-all duration-1000 ease-out delay-75"
                         style={{
                           width: `${(focusScore.distractionTime / focusScore.totalTime) * 100}%`,
                           opacity: 0.6,
@@ -608,7 +608,7 @@ export function Dashboard() {
                         title={`Distraction: ${Math.round((focusScore.distractionTime / focusScore.totalTime) * 100)}%`}
                       />
                       <div
-                        className="h-1.5 bg-primary rounded-full transition-all"
+                        className="h-1.5 bg-primary rounded-full transition-all duration-1000 ease-out delay-150"
                         style={{
                           width: `${(focusScore.neutralTime / focusScore.totalTime) * 100}%`,
                           opacity: 0.3,
@@ -616,7 +616,7 @@ export function Dashboard() {
                         title={`Neutral: ${Math.round((focusScore.neutralTime / focusScore.totalTime) * 100)}%`}
                       />
                       <div
-                        className="h-1.5 bg-primary rounded-full transition-all"
+                        className="h-1.5 bg-primary rounded-full transition-all duration-1000 ease-out delay-200"
                         style={{
                           width: `${(focusScore.othersTime / focusScore.totalTime) * 100}%`,
                           opacity: 0.1,

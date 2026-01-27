@@ -112,7 +112,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="w-[400px] h-[600px] p-0 bg-black text-white flex flex-col font-sans selection:bg-primary/30 overflow-hidden relative">
+    <div className="w-[400px] h-[600px] p-0 bg-black text-white flex flex-col font-sans selection:bg-primary/30 overflow-hidden relative animate-scale-in">
       <div className="px-6 py-4 flex-1 flex flex-col relative z-10 min-h-0">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold flex items-center gap-2 tracking-tight">
@@ -129,7 +129,7 @@ export function Sidebar() {
         <div className="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl">
           <button
             onClick={() => setActiveTab("stats")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all active:scale-95 ${
               activeTab === "stats"
                 ? "bg-primary text-white"
                 : "text-neutral-400 hover:text-white"
@@ -140,7 +140,7 @@ export function Sidebar() {
           </button>
           <button
             onClick={() => setActiveTab("pomodoro")}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all active:scale-95 ${
               activeTab === "pomodoro"
                 ? "bg-primary text-white"
                 : "text-neutral-400 hover:text-white"
@@ -154,13 +154,13 @@ export function Sidebar() {
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto min-h-0">
           {activeTab === "stats" ? (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-fade-in">
               <div className="glass-panel p-6 rounded-2xl text-center shadow-lg border-white/10 bg-white/5 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3 relative z-10">
                   Today's Browsing
                 </h2>
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 relative z-10">
+                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 relative z-10 animate-slide-up [animation-delay:100ms]">
                   {formatDuration(totalTime)}
                 </div>
                 <p className="text-xs text-neutral-500 mt-2 relative z-10">
@@ -180,7 +180,11 @@ export function Sidebar() {
                   {topSites.map((site, idx) => (
                     <div
                       key={site.domain}
-                      className="group flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/5"
+                      className="group flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/5 animate-slide-in-right"
+                      style={{
+                        animationDelay: `${idx * 100 + 200}ms`,
+                        animationFillMode: "both",
+                      }}
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <span className="text-xs font-mono text-neutral-600 w-3">
@@ -212,15 +216,17 @@ export function Sidebar() {
               </div>
             </div>
           ) : (
-            <PomodoroTab
-              templates={templates}
-              activeTimer={activeTimer}
-              onStartTimer={handleStartTimer}
-              onPauseTimer={handlePauseTimer}
-              onResumeTimer={handleResumeTimer}
-              onStopTimer={handleStopTimer}
-              onDeleteTemplate={handleDeleteTemplate}
-            />
+            <div className="animate-fade-in">
+              <PomodoroTab
+                templates={templates}
+                activeTimer={activeTimer}
+                onStartTimer={handleStartTimer}
+                onPauseTimer={handlePauseTimer}
+                onResumeTimer={handleResumeTimer}
+                onStopTimer={handleStopTimer}
+                onDeleteTemplate={handleDeleteTemplate}
+              />
+            </div>
           )}
         </div>
 
