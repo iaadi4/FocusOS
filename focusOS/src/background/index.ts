@@ -90,6 +90,44 @@ function getFavicon(url: string): string {
   }
 }
 
+/**
+ * Redirects ALL open tabs matching the given domain to the blocked page.
+ */
+async function enforceBlock(domain: string, timeLimit: number): Promise<void> {
+  const blockedUrl = browser.runtime.getURL(
+    `blocked.html?domain=${domain}&limit=${timeLimit}`,
+  );
+  const tabs = await browser.tabs.query({});
+  for (const tab of tabs) {
+    if (tab.id && tab.url && getDomain(tab.url) === domain) {
+      browser.tabs.update(tab.id, { url: blockedUrl });
+    }
+  }
+}
+
+/**
+ * Schedules a one-shot alarm to fire exactly when the domain's daily limit
+ * will be reached, so the block happens in real-time without waiting for the
+ * next periodic 1-minute save alarm.
+ */
+async function scheduleLimitAlarm(domain: string): Promise<void> {
+  const limit = await getLimit(domain);
+  if (!limit || !limit.blockOnLimit) return;
+  const usage = await getDailyUsage(domain);
+  const remainingMs = limit.timeLimit - usage.time;
+  if (remainingMs <= 0) {
+    // Already at or past the limit — enforce immediately
+    await enforceBlock(domain, limit.timeLimit);
+    return;
+  }
+  const alarmName = `limit-check-${domain}`;
+  // Cancel any existing alarm for this domain before creating a new one
+  await browser.alarms.clear(alarmName);
+  browser.alarms.create(alarmName, {
+    delayInMinutes: remainingMs / 60000,
+  });
+}
+
 async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   const limit = await getLimit(domain);
   if (!limit) return;
@@ -125,16 +163,7 @@ async function checkLimits(domain: string, timeToAdd = 0): Promise<void> {
   }
 
   if (limit.blockOnLimit && is100Percent) {
-    const [tab] = await browser.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
-    if (tab && tab.id && tab.url && getDomain(tab.url) === domain) {
-      const blockedUrl = browser.runtime.getURL(
-        `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
-      );
-      browser.tabs.update(tab.id, { url: blockedUrl });
-    }
+    await enforceBlock(domain, limit.timeLimit);
   }
 }
 
@@ -153,6 +182,10 @@ async function commitTime(): Promise<void> {
   const delayMs = settings.trackingDelaySeconds * 1000;
 
   if (!domain) return;
+
+  // Cancel any pending limit alarm for the domain we're committing time for,
+  // since we'll reschedule it below with updated usage.
+  await browser.alarms.clear(`limit-check-${domain}`);
 
   // Check how many times we've visited this domain today
   const usage = await getDailyUsage(domain);
@@ -194,18 +227,8 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
     if (limit && limit.blockOnLimit) {
       const usage = await getDailyUsage(domain);
       if (usage.time >= limit.timeLimit) {
-        const blockedUrl = browser.runtime.getURL(
-          `blocked.html?domain=${domain}&limit=${limit.timeLimit}`,
-        );
-
-        const [tab] = await browser.tabs.query({
-          active: true,
-          currentWindow: true,
-        });
-        if (tab && tab.id) {
-          browser.tabs.update(tab.id, { url: blockedUrl });
-          return; // Do not start tracking if blocked
-        }
+        await enforceBlock(domain, limit.timeLimit);
+        return; // Do not start tracking if blocked
       }
     }
 
@@ -227,6 +250,9 @@ async function startTracking(url: string, trackVisit = false): Promise<void> {
       [STORAGE_KEYS.START_TIME]: Date.now(),
       [STORAGE_KEYS.FAVICON]: getFavicon(url),
     });
+
+    // Schedule a precise alarm to fire exactly when the limit will be hit
+    await scheduleLimitAlarm(domain);
   } else {
     await stopTracking();
   }
@@ -333,22 +359,32 @@ browser.alarms.onAlarm.addListener(async (alarm) => {
     if (data._currentUrl) {
       const domain = getDomain(data._currentUrl);
       if (domain) {
-        // Also check limits during periodic save for notifications (soft check)
-        // Calculate theoretical accumulated time since start
-        const startTime = (
-          (await browser.storage.local.get(
-            STORAGE_KEYS.START_TIME,
-          )) as TrackingState
-        )._startTime;
-        if (startTime) {
-          const currentDuration = Date.now() - startTime;
-          await checkLimits(domain, currentDuration);
-        }
+        // Time is already saved by commitTime(), just check limits with current usage
+        await checkLimits(domain);
+        // Re-schedule the limit alarm with updated usage after the save
+        await scheduleLimitAlarm(domain);
       }
 
       await browser.storage.local.set({
         [STORAGE_KEYS.START_TIME]: Date.now(),
       });
+    }
+  }
+
+  // Precise limit-check alarm: fires exactly when a domain's limit is hit
+  if (alarm.name.startsWith("limit-check-")) {
+    const domain = alarm.name.replace("limit-check-", "");
+    // Commit any accumulated time first so usage is up-to-date
+    await commitTime();
+    const limit = await getLimit(domain);
+    if (limit && limit.blockOnLimit) {
+      const usage = await getDailyUsage(domain);
+      if (usage.time >= limit.timeLimit) {
+        await enforceBlock(domain, limit.timeLimit);
+      } else {
+        // Limit not yet reached (e.g. page was left early) — reschedule
+        await scheduleLimitAlarm(domain);
+      }
     }
   }
 });
