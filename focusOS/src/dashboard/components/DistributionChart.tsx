@@ -29,8 +29,8 @@ export function DistributionChart({ sites }: DistributionChartProps) {
   return (
     <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col relative overflow-hidden h-full">
       <h3 className="text-lg font-bold mb-6 text-neutral-200">Distribution</h3>
-      <div className="flex-1 min-h-[250px] relative z-10 flex items-center gap-4">
-        <div className="w-2/3 h-[250px]">
+      <div className="flex-1 min-h-[300px] relative z-10 flex items-center gap-4">
+        <div className="w-2/3 h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -39,8 +39,8 @@ export function DistributionChart({ sites }: DistributionChartProps) {
                 nameKey="domain"
                 cx="50%"
                 cy="50%"
-                innerRadius={70}
-                outerRadius={100}
+                innerRadius={100}
+                outerRadius={140}
                 paddingAngle={5}
                 stroke="none"
               >
