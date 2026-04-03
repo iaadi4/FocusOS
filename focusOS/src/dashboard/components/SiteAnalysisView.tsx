@@ -73,8 +73,8 @@ export const SiteAnalysisView: React.FC<SiteAnalysisViewProps> = ({
   return (
     <div className="flex-1 flex flex-col min-h-0 pb-4 pr-6 overflow-y-auto relative pt-1">
       <div className="flex flex-col xl:flex-row gap-5 mb-5 mt-4">
-        <div className="w-full xl:w-[350px] flex flex-col gap-4 shrink-0">
-          <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col justify-between shrink-0">
+        <div className="w-full xl:w-[350px] flex flex-col gap-4 shrink-0 h-full">
+          <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col justify-between shrink-0 h-full">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">

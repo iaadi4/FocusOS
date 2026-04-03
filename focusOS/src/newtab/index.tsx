@@ -29,7 +29,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="h-screen w-screen bg-neutral-950 text-neutral-100 font-sans flex overflow-hidden selection:bg-cyan-500/30">
+    <div className="h-screen w-screen bg-background/95 backdrop-blur-2xl text-neutral-100 font-sans flex overflow-hidden selection:bg-cyan-500/30">
       {/* Sidebar Container */}
       <aside className="h-full w-[300px] flex flex-col p-6 glass-panel border-r border-white/10 relative z-10 bg-black/40 backdrop-blur-xl">
         {/* Header */}

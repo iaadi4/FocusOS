@@ -344,14 +344,14 @@ export function Dashboard() {
   };
 
   return (
-    <div className="h-screen bg-black text-white font-sans flex relative overflow-hidden selection:bg-primary/30">
+    <div className="h-screen bg-background/95 backdrop-blur-2xl text-white font-sans flex relative overflow-hidden selection:bg-primary/30">
       {/* Ambient Background Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-black/0 to-black/0 pointer-events-none" />
 
       <aside
         className={`${
           isSidebarCollapsed ? "w-20 px-2" : "w-72 px-4"
-        } h-full pt-8 pb-4 flex flex-col gap-6 border-r border-white/10 relative z-10 bg-black overflow-y-auto transition-all duration-300 ease-in-out`}
+        } h-full pt-8 pb-4 flex flex-col gap-6 border-r border-white/10 relative z-10 bg-white/5 backdrop-blur-xl overflow-y-auto transition-all duration-300 ease-in-out`}
       >
         <div
           className={`flex items-center gap-3 px-2 ${
@@ -784,9 +784,13 @@ export function Dashboard() {
                   </h3>
                   <div className="flex-1 overflow-y-scroll pr-2 space-y-3">
                     {data.byDomain.map((site, index) => (
-                      <div
+                      <button
                         key={site.domain}
-                        className="group flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/5"
+                        onClick={() => {
+                          setSelectedDomain(site.domain);
+                          setView("site-analysis");
+                        }}
+                        className="group w-full flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-white/5 cursor-pointer text-left focus:outline-none focus:ring-1 focus:ring-primary/30"
                       >
                         <div className="flex items-center gap-4 overflow-hidden flex-1">
                           <span className="text-xs font-mono text-neutral-600 w-6 group-hover:text-primary transition-colors flex-shrink-0">
@@ -822,7 +826,7 @@ export function Dashboard() {
                         <span className="text-sm font-mono font-bold text-neutral-500 group-hover:text-primary transition-colors whitespace-nowrap ml-4">
                           {formatDurationLong(site.time)}
                         </span>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -950,7 +954,7 @@ export function Dashboard() {
                     );
                     setTrackingDelay(val);
                   }}
-                  className="w-24 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white text-center focus:outline-none focus:border-primary/50 transition-colors"
+                  className="w-24 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-center focus:outline-none focus:border-primary/50 transition-colors"
                 />
                 <span className="text-neutral-400">seconds</span>
                 <button
@@ -963,7 +967,7 @@ export function Dashboard() {
             </div>
 
             <div className="p-8 rounded-2xl bg-white/5 border border-white/5 max-h-[600px] overflow-y-auto custom-scrollbar">
-              <h3 className="text-lg font-bold mb-6 text-neutral-200 flex items-center gap-2 sticky top-0 bg-[#09090b] z-10 py-2 -mt-2">
+              <h3 className="text-lg font-bold mb-6 text-neutral-200 flex items-center gap-2 sticky top-0 backdrop-blur-xl z-10 py-2 -mt-2">
                 <Download className="w-5 h-5 text-primary" />
                 Export Data
               </h3>
@@ -987,7 +991,7 @@ export function Dashboard() {
                     <button
                       onClick={() => handleExport("csv", "daily")}
                       disabled={isExporting}
-                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      className="w-full bg-white/5 border border-white/5 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-white/10 hover:border-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       <FileText className="w-3.5 h-3.5 text-primary" />
                       Export CSV
@@ -995,7 +999,7 @@ export function Dashboard() {
                     <button
                       onClick={() => handleExport("pdf", "daily")}
                       disabled={isExporting}
-                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      className="w-full bg-white/5 border border-white/5 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-white/10 hover:border-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       <File className="w-3.5 h-3.5 text-primary" />
                       Export PDF
@@ -1021,7 +1025,7 @@ export function Dashboard() {
                     <button
                       onClick={() => handleExport("csv", "sites")}
                       disabled={isExporting}
-                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      className="w-full bg-white/5 border border-white/5 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-white/10 hover:border-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       <FileText className="w-3.5 h-3.5 text-primary" />
                       Export CSV
@@ -1029,7 +1033,7 @@ export function Dashboard() {
                     <button
                       onClick={() => handleExport("pdf", "sites")}
                       disabled={isExporting}
-                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      className="w-full bg-white/5 border border-white/5 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-white/10 hover:border-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       <File className="w-3.5 h-3.5 text-primary" />
                       Export PDF
@@ -1055,7 +1059,7 @@ export function Dashboard() {
                     <button
                       onClick={() => handleExport("csv", "pomodoro")}
                       disabled={isExporting}
-                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      className="w-full bg-white/5 border border-white/5 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-white/10 hover:border-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       <FileText className="w-3.5 h-3.5 text-primary" />
                       Export CSV
@@ -1063,7 +1067,7 @@ export function Dashboard() {
                     <button
                       onClick={() => handleExport("pdf", "pomodoro")}
                       disabled={isExporting}
-                      className="w-full bg-neutral-800 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
+                      className="w-full bg-white/5 border border-white/5 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-white/10 hover:border-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs"
                     >
                       <File className="w-3.5 h-3.5 text-primary" />
                       Export PDF
