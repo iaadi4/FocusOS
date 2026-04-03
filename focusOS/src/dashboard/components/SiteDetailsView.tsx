@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Search, Pin, ExternalLink, ArrowUpDown } from "lucide-react";
 import {
   getAggregatedData,
@@ -24,18 +24,18 @@ export function SiteDetailsView({ onSelect }: SiteDetailsViewProps) {
   );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const [aggregated, pinned] = await Promise.all([
       getAggregatedData("all-time"),
       getPinnedSites(),
     ]);
     setData(aggregated);
     setPinnedSites(pinned);
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    void fetchData();
+  }, [fetchData]);
 
   const handleTogglePin = async (domain: string, e: React.MouseEvent) => {
     e.stopPropagation();

@@ -29,7 +29,7 @@ export function PomodoroView({ range }: PomodoroViewProps) {
     };
 
     fetchData();
-  }, []);
+  }, [range]);
 
   const filteredSessions = sessions.filter((session) => {
     const date = new Date(session.startTime);
@@ -38,7 +38,8 @@ export function PomodoroView({ range }: PomodoroViewProps) {
     if (range === "today") {
       return date.toDateString() === now.toDateString();
     } else if (range === "week") {
-      const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay());
       weekStart.setHours(0, 0, 0, 0);
       return date >= weekStart;
     } else if (range === "month") {

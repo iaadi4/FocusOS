@@ -10,21 +10,29 @@ type AchievementEventType =
   | "whitelist-cleared"
   | "misc";
 
+interface AchievementData {
+  totalMinutes?: number;
+  phase?: string;
+  consecutiveSessions?: number;
+  totalSessions?: number;
+  count?: number;
+}
+
 export async function checkAchievements(
   type: AchievementEventType,
-  data?: any,
+  data?: AchievementData,
 ) {
   const newlyUnlocked: string[] = [];
 
   switch (type) {
-    case "pomodoro-complete":
+    case "pomodoro-complete": {
       // Check for first session
       if (await unlockAchievement("first-step")) {
         newlyUnlocked.push("first-step");
       }
 
       // Check for 10 sessions (data.totalSessions should be passed)
-      if (data?.totalSessions >= 10) {
+      if (data?.totalSessions !== undefined && data.totalSessions >= 10) {
         if (await unlockAchievement("focus-master")) {
           newlyUnlocked.push("focus-master");
         }
@@ -38,15 +46,18 @@ export async function checkAchievements(
       }
 
       // Deep Focus: 4 sessions in a row
-      // We need to know previous consecutive sessions. Assuming data.consecutiveSessions is passed.
-      if (data?.consecutiveSessions >= 4) {
+      if (
+        data?.consecutiveSessions !== undefined &&
+        data.consecutiveSessions >= 4
+      ) {
         if (await unlockAchievement("deep-focus")) {
           newlyUnlocked.push("deep-focus");
         }
       }
       break;
+    }
 
-    case "time-tracked":
+    case "time-tracked": {
       const minutes = data?.totalMinutes || 0;
       // 1 hour = 60 mins
       if (minutes >= 60) {
@@ -68,7 +79,6 @@ export async function checkAchievements(
       }
 
       // Early Bird: Start working before 8 AM
-      // Assuming this event is triggered when time tracking starts/updates and we check current time
       const now = new Date();
       if (now.getHours() < 8 && minutes > 0) {
         if (await unlockAchievement("early-bird")) {
@@ -83,21 +93,13 @@ export async function checkAchievements(
         }
       }
       break;
+    }
 
     case "app-opened":
-    case "misc":
-      // Weekend Warrior: Use on Sat (6) and Sun (0)
-      // This is tricky without persistent history of "days used".
-      // Simplification: Check if today is Sat or Sun. If so, check if we used it yesterday (if Sun) or wait for tomorrow (if Sat)?
-      // Better: The storage keeps track of `lastVisited` or daily stats.
-      // For now, let's just trigger it if it's weekend. Real implementation would check history.
+    case "misc": {
       const today = new Date();
       const day = today.getDay();
       if (day === 0 || day === 6) {
-        // Ideally check if we have data for both Sat and Sun of this week.
-        // For MVP, we'll just award it if they use it on a weekend day to encourage weekend work (or not!).
-        // Actually description says "both". Let's assume the caller checks history.
-        // Fallback: simple check for now.
         if (await unlockAchievement("weekend-warrior")) {
           newlyUnlocked.push("weekend-warrior");
         }
@@ -110,22 +112,24 @@ export async function checkAchievements(
         }
       }
       break;
+    }
 
-    case "logo-click":
+    case "logo-click": {
       // The Glitch
-      // Logic handled by caller to counts clicks, or we pass count here
-      if (data?.count >= 5) {
+      if (data?.count !== undefined && data.count >= 5) {
         if (await unlockAchievement("the-glitch")) {
           newlyUnlocked.push("the-glitch");
         }
       }
       break;
+    }
 
-    case "whitelist-cleared":
+    case "whitelist-cleared": {
       if (await unlockAchievement("clean-slate")) {
         newlyUnlocked.push("clean-slate");
       }
       break;
+    }
 
     // Additional checks for streaks etc. can be added here
   }

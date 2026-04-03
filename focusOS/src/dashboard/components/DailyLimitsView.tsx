@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Timer, Search, ShieldAlert } from "lucide-react";
 import { formatDuration, formatDomain } from "../../utils/format";
 import { getStorageData, saveLimit } from "../../utils/storage";
@@ -10,16 +10,19 @@ export const DailyLimitsView = () => {
   const [search, setSearch] = useState("");
   const [editingDomain, setEditingDomain] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const loadData = useCallback(async () => {
     const limitsData = await getStorageData("limits");
     setLimits(limitsData.limits || {});
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000);
+    void loadData();
+    const interval = setInterval(() => void loadData(), 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadData]);
+
+  // Expose as fetchData for manual refreshes after mutations
+  const fetchData = loadData;
 
   const isValidDomain = (domain: string) => {
     // Allows localhost, IPv4, and standard domains like example.com
@@ -116,7 +119,7 @@ export const DailyLimitsView = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pb-4">
         {filteredDomains.map((domain) => (
           <LimitCard
-            key={domain}
+            key={`${domain}-${JSON.stringify(limits[domain])}`}
             domain={domain}
             favicon={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
             currentLimit={limits[domain]}
@@ -176,16 +179,6 @@ const LimitCard = ({
   const [notify80, setNotify80] = useState(currentLimit?.notify80 ?? true);
   const [notify100, setNotify100] = useState(currentLimit?.notify100 ?? true);
   const [block, setBlock] = useState(currentLimit?.blockOnLimit ?? false);
-
-  // Reset state when currentLimit changes, only if we have a limit
-  useEffect(() => {
-    if (!isEditing && currentLimit) {
-      setMinutes(Math.round(currentLimit.timeLimit / 60000));
-      setNotify80(currentLimit.notify80);
-      setNotify100(currentLimit.notify100);
-      setBlock(currentLimit.blockOnLimit);
-    }
-  }, [currentLimit, isEditing]);
 
   const handleSave = async () => {
     await saveLimit(domain, {

@@ -6,7 +6,7 @@
  * - whitelist: Manage excluded domains
  * - settings: Configure tracking delay
  */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import {
   getAggregatedData,
@@ -96,6 +96,7 @@ export function Dashboard() {
       v === "limits" ||
       v === "site-details" ||
       v === "pomodoro" ||
+      v === "achievements" ||
       v === "site-categories"
       ? v
       : "dashboard";
@@ -188,7 +189,7 @@ export function Dashboard() {
     });
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const result = await getAggregatedData(range);
     const insightsResult = await getInsights(range);
     const whitelistData = await getStorageData("whitelist");
@@ -197,20 +198,20 @@ export function Dashboard() {
     setInsights(insightsResult);
     setWhitelist(whitelistData.whitelist || []);
     setFocusScore(focusScoreResult);
-  };
+  }, [range]);
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     const settingsData = await getSettings();
     setTrackingDelay(settingsData.trackingDelaySeconds);
     if (settingsData.theme) {
       setCurrentThemeId(settingsData.theme);
       applyTheme(settingsData.theme);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
 
   useEffect(() => {
     fetchData();
@@ -220,7 +221,7 @@ export function Dashboard() {
     checkAchievements("app-opened");
 
     return () => clearInterval(interval);
-  }, [range]);
+  }, [fetchData]);
 
   const handleAddWhitelist = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,7 +283,18 @@ export function Dashboard() {
 
   // ...
 
-  const navItems = [
+  type ViewId =
+    | "dashboard"
+    | "whitelist"
+    | "settings"
+    | "site-analysis"
+    | "limits"
+    | "site-details"
+    | "pomodoro"
+    | "achievements"
+    | "site-categories";
+
+  const navItems: { id: string; label: string; icon: typeof LayoutTemplate; view: ViewId }[] = [
     {
       id: "dashboard",
       label: "Dashboard",
@@ -373,7 +385,7 @@ export function Dashboard() {
             <button
               key={item.id}
               onClick={() => {
-                setView(item.view as any);
+                setView(item.view);
               }}
               className={`flex items-center gap-3 text-sm font-semibold transition-all duration-200 group ${
                 isSidebarCollapsed

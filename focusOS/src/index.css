@@ -78,12 +78,6 @@
   }
 }
 
-@layer base {
-  body {
-    @apply bg-background text-foreground antialiased;
-  }
-}
-
 /* Glassmorphism Utilities */
 .glass-panel {
   @apply bg-background/60 backdrop-blur-lg border border-white/10;

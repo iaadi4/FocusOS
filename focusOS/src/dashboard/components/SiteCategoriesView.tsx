@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   getAggregatedData,
   getSiteCategories,
@@ -35,13 +35,7 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
   const [newDomain, setNewDomain] = useState("");
   const [newCategory, setNewCategory] = useState<SiteCategory>("productive");
 
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 2000);
-    return () => clearInterval(interval);
-  }, [range]);
-
-  const fetchData = async () => {
+  const loadData = useCallback(async () => {
     const [aggregatedData, categoriesData] = await Promise.all([
       getAggregatedData(range),
       getSiteCategories(),
@@ -74,7 +68,15 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
 
     setCategories(categoriesData);
     setSites(allSites);
-  };
+  }, [range]);
+
+  const fetchData = loadData;
+
+  useEffect(() => {
+    void loadData();
+    const interval = setInterval(() => void loadData(), 2000);
+    return () => clearInterval(interval);
+  }, [loadData]);
 
   const handleCategoryChange = async (
     domain: string,
@@ -108,13 +110,13 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
   const getCategoryColor = (category: SiteCategory) => {
     switch (category) {
       case "productive":
-        return "text-primary bg-primary/20 border-primary/30";
+        return "text-emerald-400 bg-emerald-500/20 border-emerald-500/30";
       case "distraction":
-        return "text-primary bg-primary/15 border-primary/25";
+        return "text-rose-400 bg-rose-500/20 border-rose-500/30";
       case "neutral":
-        return "text-primary bg-primary/10 border-primary/20";
+        return "text-amber-400 bg-amber-500/20 border-amber-500/30";
       case "others":
-        return "text-primary bg-primary/5 border-primary/10";
+        return "text-neutral-400 bg-neutral-500/10 border-neutral-500/20";
     }
   };
 
@@ -147,10 +149,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
     <div className="space-y-4 pr-6">
       {/* Header Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="p-3 rounded-xl bg-primary/20 border border-primary/30 flex flex-col justify-between">
+        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
               Productive
             </h3>
           </div>
@@ -164,10 +166,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-primary/15 border border-primary/25 flex flex-col justify-between">
+        <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/30 flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-1">
-            <XCircle className="w-3.5 h-3.5 text-primary" />
-            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">
+            <XCircle className="w-3.5 h-3.5 text-rose-400" />
+            <h3 className="text-xs font-semibold text-rose-400 uppercase tracking-wider">
               Distraction
             </h3>
           </div>
@@ -181,10 +183,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 flex flex-col justify-between">
+        <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/30 flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-1">
-            <MinusCircle className="w-3.5 h-3.5 text-primary" />
-            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">
+            <MinusCircle className="w-3.5 h-3.5 text-amber-400" />
+            <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
               Neutral
             </h3>
           </div>
@@ -198,10 +200,10 @@ export function SiteCategoriesView({ range }: SiteCategoriesViewProps) {
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 flex flex-col justify-between">
+        <div className="p-3 rounded-xl bg-neutral-500/10 border border-neutral-500/20 flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-1">
-            <Circle className="w-3.5 h-3.5 text-primary" />
-            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">
+            <Circle className="w-3.5 h-3.5 text-neutral-400" />
+            <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
               Others
             </h3>
           </div>

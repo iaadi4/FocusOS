@@ -518,23 +518,40 @@ async function handlePhaseComplete(state: PomodoroState) {
 }
 
 // Message handler for Pomodoro commands from popup
-browser.runtime.onMessage.addListener(async (message: any) => {
-  if (message.type === "pomodoroStart") {
-    await startPomodoro(message.templateId);
+type PomodoroMessage =
+  | { type: "pomodoroStart"; templateId: string }
+  | { type: "pomodoroPause" }
+  | { type: "pomodoroResume" }
+  | { type: "pomodoroStop" };
+
+browser.runtime.onMessage.addListener(async (message: unknown) => {
+  if (
+    !message ||
+    typeof message !== "object" ||
+    !("type" in message) ||
+    typeof (message as { type: unknown }).type !== "string"
+  ) {
+    return;
+  }
+
+  const msg = message as PomodoroMessage;
+
+  if (msg.type === "pomodoroStart") {
+    await startPomodoro((msg as { type: "pomodoroStart"; templateId: string }).templateId);
     return { success: true };
   }
 
-  if (message.type === "pomodoroPause") {
+  if (msg.type === "pomodoroPause") {
     await pausePomodoro();
     return { success: true };
   }
 
-  if (message.type === "pomodoroResume") {
+  if (msg.type === "pomodoroResume") {
     await resumePomodoro();
     return { success: true };
   }
 
-  if (message.type === "pomodoroStop") {
+  if (msg.type === "pomodoroStop") {
     await stopPomodoro(true);
     return { success: true };
   }

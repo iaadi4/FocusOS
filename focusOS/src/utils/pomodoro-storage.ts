@@ -7,6 +7,7 @@ import type {
   PomodoroSession,
   PomodoroState,
   PomodoroStats,
+  StorageData,
 } from "./types";
 import { getStorageData, setStorageData, getTodayKey } from "./storage";
 import browser from "webextension-polyfill";
@@ -70,7 +71,7 @@ export const savePomodoroTemplate = async (
   };
 
   customTemplates.push(newTemplate);
-  await setStorageData({ [POMODORO_TEMPLATES_KEY]: customTemplates } as any);
+  await setStorageData({ [POMODORO_TEMPLATES_KEY]: customTemplates } as unknown as Partial<StorageData>);
 };
 
 // Delete a custom template
@@ -80,7 +81,7 @@ export const deletePomodoroTemplate = async (id: string): Promise<void> => {
     (data[POMODORO_TEMPLATES_KEY] as unknown as PomodoroTemplate[]) || [];
 
   const filtered = customTemplates.filter((t) => t.id !== id);
-  await setStorageData({ [POMODORO_TEMPLATES_KEY]: filtered } as any);
+  await setStorageData({ [POMODORO_TEMPLATES_KEY]: filtered } as unknown as Partial<StorageData>);
 };
 
 // Get current Pomodoro state
@@ -93,7 +94,7 @@ export const getPomodoroState = async (): Promise<PomodoroState | null> => {
 export const savePomodoroState = async (
   state: PomodoroState,
 ): Promise<void> => {
-  await setStorageData({ [POMODORO_STATE_KEY]: state } as any);
+  await setStorageData({ [POMODORO_STATE_KEY]: state } as unknown as Partial<StorageData>);
 };
 
 // Clear Pomodoro state (when timer stops)
@@ -110,7 +111,7 @@ export const savePomodoroSession = async (
   const sessions = (data[todayKey] as unknown as PomodoroSession[]) || [];
 
   sessions.push(session);
-  await setStorageData({ [todayKey]: sessions } as any);
+  await setStorageData({ [todayKey]: sessions } as unknown as Partial<StorageData>);
 };
 
 // Get Pomodoro sessions for a date range

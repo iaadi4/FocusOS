@@ -11,12 +11,14 @@ import {
   Star,
 } from "lucide-react";
 
+import type { LucideIcon } from "lucide-react";
+
 export interface Achievement {
   id: string;
   title: string;
   description: string;
   xp: number;
-  icon: any; // Lucide icon component
+  icon: LucideIcon;
   category: "time" | "pomodoro" | "streak" | "misc";
   isSecret?: boolean;
 }

@@ -55,7 +55,7 @@ export const BrowsingTrendsChart: React.FC<ChartProps> = ({ data }) => {
                 borderRadius: "12px",
                 color: "#fff",
               }}
-              formatter={(value: any) => [
+              formatter={(value: number | string | undefined) => [
                 formatDuration(Number(value) || 0),
                 "Time",
               ]}
@@ -114,7 +114,7 @@ export const VisitTrendsChart: React.FC<ChartProps> = ({ data }) => {
                 borderRadius: "12px",
                 color: "#fff",
               }}
-              formatter={(value: any) => [Number(value) || 0, "Visits"]}
+              formatter={(value: number | string | undefined) => [Number(value) || 0, "Visits"]}
               labelStyle={{ color: "#a1a1aa" }}
               cursor={{ stroke: "rgba(255,255,255,0.2)" }}
             />

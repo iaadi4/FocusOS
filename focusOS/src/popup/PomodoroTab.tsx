@@ -1,4 +1,5 @@
 import { Timer, Play, Pause, Square, Music } from "lucide-react";
+import browser from "webextension-polyfill";
 import { formatDuration } from "../utils/format";
 import type { PomodoroTemplate, PomodoroState } from "../utils/types";
 
@@ -59,7 +60,7 @@ export function PomodoroTab({
               : "bg-emerald-500/10 border border-emerald-500/20"
           }`}
         >
-          {/* Circular Progress */}
+          {/* Circular Progress with overlaid text */}
           <div className="relative w-36 h-36 mx-auto mb-4">
             <svg className="w-full h-full -rotate-90">
               <circle
@@ -88,14 +89,26 @@ export function PomodoroTab({
                 strokeLinecap="round"
               />
             </svg>
+            {/* Timer text centered inside ring */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="text-2xl font-black text-white font-mono leading-none">
+                {formatDuration(activeTimer.remainingMs)}
+              </div>
+              <div
+                className={`text-[10px] font-bold mt-1 uppercase tracking-wider ${
+                  activeTimer.currentPhase === "work"
+                    ? "text-primary"
+                    : "text-emerald-400"
+                }`}
+              >
+                {activeTimer.currentPhase === "work" ? "FOCUS" : "BREAK"}
+              </div>
+            </div>
           </div>
 
           <div className="mb-3">
-            <div className="text-4xl font-black text-white font-mono">
-              {formatDuration(activeTimer.remainingMs)}
-            </div>
             <div
-              className={`text-xs font-bold mt-2 ${
+              className={`text-xs font-bold ${
                 activeTimer.currentPhase === "work"
                   ? "text-primary"
                   : "text-emerald-400"
@@ -221,7 +234,7 @@ export function PomodoroTab({
           </h3>
           <button
             onClick={() => {
-              chrome.tabs.create({
+              browser.tabs.create({
                 url: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
                 active: false,
               });
