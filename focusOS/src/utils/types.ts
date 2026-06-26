@@ -1,9 +1,9 @@
 export interface DailyData {
   [domain: string]: {
-    time: number; // milliseconds
+    time: number;
     favicon: string;
-    lastVisited: number; // timestamp
-    visitCount: number; // number of visits per day
+    lastVisited: number;
+    visitCount: number;
     notifications?: NotificationState;
   };
 }
@@ -14,15 +14,15 @@ export interface NotificationState {
 }
 
 export interface Limit {
-  timeLimit: number; // in milliseconds
+  timeLimit: number;
   notify80: boolean;
   notify100: boolean;
   blockOnLimit: boolean;
 }
 
 export interface Settings {
-  trackingDelaySeconds: number; // 1-100, default 15
-  theme: string; // Theme color name (e.g. "red-500")
+  trackingDelaySeconds: number;
+  theme: string;
 }
 
 export interface StorageData {
@@ -61,28 +61,25 @@ export interface Insights {
   dailyAverage: number;
 }
 
-// Site Analysis types
 export interface SiteAnalysisData {
   domain: string;
   favicon: string;
   totalTime: number;
   totalVisits: number;
   totalActiveDays: number;
-  firstUsed: string; // date string YYYY-MM-DD
-  lastUsed: number; // timestamp
+  firstUsed: string;
+  lastUsed: number;
 
-  // Daily breakdown for charts
   dailyData: {
     date: string;
     time: number;
     visits: number;
   }[];
 
-  // Heat map data (last ~26 weeks)
   heatMapData: {
     date: string;
     time: number;
-    intensity: number; // 0-4 scale
+    intensity: number;
   }[];
 }
 
@@ -95,12 +92,9 @@ export interface TrendMetrics {
   avgDailyVisits: number;
   totalTime: number;
   totalVisits: number;
-  // Comparison to previous period
-  timeChange: number; // percentage
-  visitsChange: number; // percentage
+  timeChange: number;
+  visitsChange: number;
 }
-
-// Pomodoro types
 export interface PomodoroTemplate {
   id: string;
   name: string;
@@ -142,7 +136,6 @@ export interface PomodoroStats {
   sessionsToday: number;
 }
 
-// Site Categories types
 export type SiteCategory = "productive" | "distraction" | "neutral" | "others";
 
 export interface SiteCategoryMap {
@@ -150,7 +143,7 @@ export interface SiteCategoryMap {
 }
 
 export interface FocusScore {
-  score: number; // 0-100
+  score: number;
   productiveTime: number;
   distractionTime: number;
   neutralTime: number;

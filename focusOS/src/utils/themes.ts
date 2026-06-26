@@ -1,16 +1,9 @@
-/**
- * Application themes
- *
- * Maps theme names to their HSL color values.
- * Used for dynamic theming of the application.
- */
-
 export interface Theme {
   id: string;
   name: string;
-  color: string; // Tailwind class for preview (e.g., bg-red-400)
-  primary: string; // HSL value for primary color
-  ring: string; // HSL value for focus rings
+  color: string;
+  primary: string;
+  ring: string;
 }
 
 export const THEMES: Theme[] = [

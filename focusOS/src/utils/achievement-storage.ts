@@ -25,7 +25,7 @@ export async function unlockAchievement(id: string): Promise<boolean> {
   const state = await getAchievementState();
 
   if (state.unlockedIds.includes(id)) {
-    return false; // Already unlocked
+    return false;
   }
 
   const achievement = ACHIEVEMENTS.find((a) => a.id === id);
@@ -39,5 +39,5 @@ export async function unlockAchievement(id: string): Promise<boolean> {
   };
 
   await saveAchievementState(newState);
-  return true; // Newly unlocked
+  return true;
 }

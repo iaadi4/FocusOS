@@ -19,17 +19,13 @@ export const getAllDataForExport = async (): Promise<ExportData[]> => {
   const result: ExportData[] = [];
 
   Object.keys(data).forEach((key) => {
-    // Check if key is a date (YYYY-MM-DD)
     if (!key.match(/^\d{4}-\d{2}-\d{2}$/)) return;
 
-    // Use type assertion safely
     const dailyData = data[key] as unknown as DailyData;
 
-    // Safety check - if it's not an object or array, skip it
     if (typeof dailyData !== "object" || dailyData === null) return;
 
     Object.entries(dailyData).forEach(([domain, stats]) => {
-      // Double check stats structure
       if (typeof stats !== "object" || stats === null) return;
 
       result.push({
@@ -42,7 +38,6 @@ export const getAllDataForExport = async (): Promise<ExportData[]> => {
     });
   });
 
-  // Sort by date descending
   return result.sort((a, b) => b.date.localeCompare(a.date));
 };
 
@@ -92,7 +87,7 @@ export const exportToCSV = async (type: ExportType = "daily") => {
       ...data.map((row) =>
         [
           row.date,
-          `"${row.domain}"`, // Quote domain to handle potential commas
+          `"${row.domain}"`,
           row.timeSeconds,
           row.visitCount,
           `"${row.lastVisited}"`,
@@ -223,7 +218,7 @@ export const exportToPDF = async (type: ExportType = "daily") => {
       startY: 40,
       theme: "grid",
       styles: { fontSize: 9 },
-      headStyles: { fillColor: [37, 99, 235] }, // Blue
+      headStyles: { fillColor: [37, 99, 235] },
     });
     filename = `focusos_sites_export_${getTodayKey()}.pdf`;
   } else if (type === "pomodoro") {
@@ -250,7 +245,7 @@ export const exportToPDF = async (type: ExportType = "daily") => {
       startY: 40,
       theme: "grid",
       styles: { fontSize: 9 },
-      headStyles: { fillColor: [22, 163, 74] }, // Green
+      headStyles: { fillColor: [22, 163, 74] },
     });
     filename = `focusos_pomodoro_export_${getTodayKey()}.pdf`;
   }

@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import browser from "webextension-polyfill";
 import { getAggregatedData } from "../utils/storage";
 import type { AggregatedData } from "../utils/types";
 import { formatDuration } from "../utils/format";
-import { ArrowRight, Clock, Activity } from "lucide-react";
+import { Favicon } from "../components/ui/Favicon";
+import { Button } from "../components/ui/Button";
+import { SectionLabel } from "../components/ui/SectionLabel";
+import { Hourglass } from "lucide-react";
 import "../index.css";
 
-export function Sidebar() {
+export function NewTabApp() {
   const [data, setData] = useState<AggregatedData>({
     totalTime: 0,
     byDomain: [],
@@ -19,8 +22,7 @@ export function Sidebar() {
       setData(result);
     };
     fetchData();
-    // Update every 5 seconds to keep it relatively fresh without killing performance
-    const interval = setInterval(fetchData, 5000);
+    const interval = setInterval(fetchData, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -29,106 +31,90 @@ export function Sidebar() {
   };
 
   return (
-    <div className="h-screen w-screen bg-background/95 backdrop-blur-2xl text-neutral-100 font-sans flex overflow-hidden selection:bg-cyan-500/30">
-      {/* Sidebar Container */}
-      <aside className="h-full w-[300px] flex flex-col p-6 glass-panel border-r border-white/10 relative z-10 bg-black/40 backdrop-blur-xl">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <Clock className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg leading-tight">Focus</h1>
-            <p className="text-xs text-neutral-400 font-medium">
-              Daily Tracker
-            </p>
-          </div>
-        </div>
+    <div className="h-screen w-screen bg-[#0A0A0A] text-[#F5F5F5] font-sans flex overflow-hidden select-none">
+      <aside className="h-full w-[320px] bg-[#0A0A0A] border-r border-[#242424] p-8 flex flex-col justify-between shrink-0 z-10">
+        <div>
+          <header className="flex items-center gap-2.5 mb-12">
+            <Hourglass size={16} className="text-[#C9A96E]" />
+            <span className="text-sm uppercase tracking-[0.14em] font-semibold text-[#F5F5F5]">
+              FOCUSOS
+            </span>
+          </header>
 
-        {/* Main Stats */}
-        <div className="mb-10">
-          <h2 className="text-sm font-medium text-neutral-400 mb-2 uppercase tracking-wider">
-            Today's Focus
-          </h2>
-          <div className="text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-400">
-            {formatDuration(data.totalTime)}
+          <div className="mb-10">
+            <SectionLabel className="mb-2">TODAY'S BROWSING</SectionLabel>
+            <div className="text-[52px] font-light leading-[60px] text-[#C9A96E] font-mono tracking-tight">
+              {formatDuration(data.totalTime)}
+            </div>
+            <div className="text-xs text-[#4A4A4A] mt-1">
+              Active tracking time
+            </div>
           </div>
-        </div>
 
-        {/* Top Sites */}
-        <div className="flex-1 overflow-y-auto mb-6 scrollbar-hide">
-          <h2 className="text-sm font-medium text-neutral-400 mb-4 uppercase tracking-wider flex items-center gap-2">
-            <Activity className="w-4 h-4" />
-            Top Activity
-          </h2>
-
-          <div className="space-y-1">
-            {data.byDomain.slice(0, 5).map((site, index) => (
-              <div
-                key={site.domain}
-                className="group flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all duration-200 cursor-default"
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <span className="text-xs font-mono text-neutral-600 group-hover:text-neutral-400 w-4 transition-colors">
-                    {index + 1}
-                  </span>
-                  <img
-                    src={
-                      site.favicon ||
-                      `https://www.google.com/s2/favicons?domain=${site.domain}`
-                    }
-                    className="w-5 h-5 rounded-md opacity-70 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0"
-                    alt=""
-                  />
-                  <span className="truncate text-sm font-medium text-neutral-300 group-hover:text-white transition-colors">
-                    {site.domain}
+          <div className="flex flex-col">
+            <SectionLabel className="mb-3">TOP SITES</SectionLabel>
+            <div className="border border-[#242424] bg-[#111111] rounded-[4px] overflow-hidden">
+              {data.byDomain.slice(0, 5).map((site, index) => (
+                <div
+                  key={site.domain}
+                  className={`h-[44px] px-3 flex items-center justify-between transition-colors duration-150 hover:bg-[#1A1A1A] ${
+                    index < Math.min(data.byDomain.length, 5) - 1
+                      ? "border-b border-[#1C1C1C]"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0 pr-3">
+                    <span className="text-[11px] font-mono text-[#4A4A4A] w-3 text-center shrink-0">
+                      {index + 1}
+                    </span>
+                    <Favicon src={site.favicon} domain={site.domain} size={20} />
+                    <span className="text-[13px] font-normal text-[#F5F5F5] truncate">
+                      {site.domain}
+                    </span>
+                  </div>
+                  <span className="text-[13px] font-medium font-mono text-[#F5F5F5] shrink-0">
+                    {formatDuration(site.time)}
                   </span>
                 </div>
-                <span className="text-xs font-mono text-neutral-500 group-hover:text-cyan-400 transition-colors">
-                  {formatDuration(site.time)}
-                </span>
-              </div>
-            ))}
-
-            {data.byDomain.length === 0 && (
-              <div className="text-center py-8 text-neutral-600 text-sm">
-                No activity yet.
-              </div>
-            )}
+              ))}
+              {data.byDomain.length === 0 && (
+                <div className="h-[88px] flex items-center justify-center text-xs text-[#4A4A4A]">
+                  No browsing tracked today
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Footer Action */}
-        <button
-          onClick={openDashboard}
-          className="w-full group flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-cyan-600/10 to-blue-600/10 hover:from-cyan-600 hover:to-blue-600 border border-white/5 hover:border-transparent transition-all duration-300 shadow-lg"
-        >
-          <span className="font-semibold text-sm group-hover:text-white transition-colors">
-            Full Dashboard
-          </span>
-          <ArrowRight className="w-4 h-4 text-cyan-500 group-hover:text-white transform group-hover:translate-x-1 transition-all" />
-        </button>
+        <Button variant="primary" onClick={openDashboard} className="w-full text-xs">
+          FULL DASHBOARD →
+        </Button>
       </aside>
 
-      {/* Aesthetic Background Area */}
-      <div className="flex-1 relative overflow-hidden bg-black">
-        {/* Abstract Gradients */}
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
-        <div className="absolute bottom-[-20%] right-[20%] w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
+      <main className="flex-1 bg-[#0A0A0A] relative flex items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `linear-gradient(#242424 1px, transparent 1px), linear-gradient(90deg, #242424 1px, transparent 1px)`,
+            backgroundSize: "32px 32px",
+          }}
+        />
 
-        {/* Quote or Greeting could go here if requested, for now just clean aesthetic */}
-        <div className="absolute bottom-12 right-12 text-right opacity-30 select-none pointer-events-none">
-          <h3 className="text-9xl font-black text-white/5 leading-none">
-            FOCUS
-          </h3>
+        <div className="text-center select-none pointer-events-none z-0">
+          <h2 className="text-[140px] font-thin text-[#111111] tracking-widest leading-none">
+            FOCUSOS
+          </h2>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Sidebar />
-  </React.StrictMode>,
-);
+const rootEl = document.getElementById("root");
+if (rootEl) {
+  createRoot(rootEl).render(
+    <StrictMode>
+      <NewTabApp />
+    </StrictMode>
+  );
+}

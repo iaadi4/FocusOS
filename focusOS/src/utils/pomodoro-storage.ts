@@ -1,7 +1,4 @@
-/**
- * Pomodoro Storage Utilities
- * Functions for managing Pomodoro templates, sessions, state, and stats
- */
+
 import type {
   PomodoroTemplate,
   PomodoroSession,
@@ -16,7 +13,7 @@ const POMODORO_TEMPLATES_KEY = "pomodoroTemplates";
 const POMODORO_STATE_KEY = "pomodoroState";
 const POMODORO_SESSIONS_KEY = "pomodoroSessions";
 
-// Preset templates
+
 const PRESET_TEMPLATES: PomodoroTemplate[] = [
   {
     id: "classic",
@@ -48,7 +45,7 @@ const PRESET_TEMPLATES: PomodoroTemplate[] = [
   },
 ];
 
-// Get all templates (preset + custom)
+
 export const getPomodoroTemplates = async (): Promise<PomodoroTemplate[]> => {
   const data = await getStorageData(POMODORO_TEMPLATES_KEY);
   const customTemplates =
@@ -56,7 +53,7 @@ export const getPomodoroTemplates = async (): Promise<PomodoroTemplate[]> => {
   return [...PRESET_TEMPLATES, ...customTemplates];
 };
 
-// Save a custom template
+
 export const savePomodoroTemplate = async (
   template: Omit<PomodoroTemplate, "id" | "isCustom">,
 ): Promise<void> => {
@@ -74,7 +71,7 @@ export const savePomodoroTemplate = async (
   await setStorageData({ [POMODORO_TEMPLATES_KEY]: customTemplates } as unknown as Partial<StorageData>);
 };
 
-// Delete a custom template
+
 export const deletePomodoroTemplate = async (id: string): Promise<void> => {
   const data = await getStorageData(POMODORO_TEMPLATES_KEY);
   const customTemplates =
@@ -84,25 +81,25 @@ export const deletePomodoroTemplate = async (id: string): Promise<void> => {
   await setStorageData({ [POMODORO_TEMPLATES_KEY]: filtered } as unknown as Partial<StorageData>);
 };
 
-// Get current Pomodoro state
+
 export const getPomodoroState = async (): Promise<PomodoroState | null> => {
   const data = await getStorageData(POMODORO_STATE_KEY);
   return (data[POMODORO_STATE_KEY] as unknown as PomodoroState) || null;
 };
 
-// Save Pomodoro state
+
 export const savePomodoroState = async (
   state: PomodoroState,
 ): Promise<void> => {
   await setStorageData({ [POMODORO_STATE_KEY]: state } as unknown as Partial<StorageData>);
 };
 
-// Clear Pomodoro state (when timer stops)
+
 export const clearPomodoroState = async (): Promise<void> => {
   await browser.storage.local.remove(POMODORO_STATE_KEY);
 };
 
-// Save a completed or interrupted session
+
 export const savePomodoroSession = async (
   session: PomodoroSession,
 ): Promise<void> => {
@@ -114,7 +111,7 @@ export const savePomodoroSession = async (
   await setStorageData({ [todayKey]: sessions } as unknown as Partial<StorageData>);
 };
 
-// Get Pomodoro sessions for a date range
+
 export const getPomodoroSessions = async (
   startDate?: string,
   endDate?: string,
@@ -125,8 +122,6 @@ export const getPomodoroSessions = async (
   Object.keys(allData).forEach((key) => {
     if (key.startsWith(POMODORO_SESSIONS_KEY)) {
       const dateStr = key.replace(`${POMODORO_SESSIONS_KEY}-`, "");
-
-      // Filter by date range if provided
       if (startDate && dateStr < startDate) return;
       if (endDate && dateStr > endDate) return;
 
@@ -138,7 +133,7 @@ export const getPomodoroSessions = async (
   return sessions.sort((a, b) => b.startTime - a.startTime);
 };
 
-// Get aggregated Pomodoro stats
+
 export const getPomodoroStats = async (): Promise<PomodoroStats> => {
   const allSessions = await getPomodoroSessions();
   const today = getTodayKey();

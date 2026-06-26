@@ -1,12 +1,3 @@
-/**
- * Storage Utilities - Chrome storage API wrapper
- *
- * Key functions:
- * - saveTime(): Save browsing time for a domain
- * - getAggregatedData(): Get stats for a time range
- * - getSettings/setSettings(): Manage user preferences
- * - addToWhitelist/removeFromWhitelist(): Manage excluded domains
- */
 import type {
   StorageData,
   DailyData,
@@ -42,7 +33,7 @@ const withLock = async <T>(fn: () => Promise<T>): Promise<T> => {
 
 const DEFAULT_SETTINGS: Settings = {
   trackingDelaySeconds: 15,
-  theme: "blue-500", // Default to blue-500 which matches the original primary color
+  theme: "blue-500",
 };
 
 export const getTodayKey = (): string => {
@@ -146,15 +137,11 @@ export const saveTime = async (
 export const getAggregatedData = async (
   range: TimeRange,
 ): Promise<AggregatedData> => {
-  const data = await getStorageData(null); // Fetch all data
+  const data = await getStorageData(null);
   const today = new Date();
   const result: DailyData = {};
 
   Object.keys(data).forEach((key) => {
-    if (key === WHITELIST_KEY) return;
-
-    // Check if key is a date and within range
-    // Simple date check
     if (!key.match(/^\d{4}-\d{2}-\d{2}$/)) return;
 
     const date = new Date(key);
@@ -194,10 +181,9 @@ export const getAggregatedData = async (
         }
         result[domain].time += dayData[domain].time;
         result[domain].visitCount += dayData[domain].visitCount || 0;
-        // Keep the most recent lastVisited
         if (dayData[domain].lastVisited > result[domain].lastVisited) {
           result[domain].lastVisited = dayData[domain].lastVisited;
-          result[domain].favicon = dayData[domain].favicon; // Update favicon to most recent
+          result[domain].favicon = dayData[domain].favicon;
         }
       });
     }
@@ -259,7 +245,6 @@ export const getInsights = async (range: TimeRange): Promise<Insights> => {
       });
 
       if (dayTotal > 0) {
-        // Only count active days
         totalTime += dayTotal;
         daysCount++;
 
@@ -276,7 +261,7 @@ export const getInsights = async (range: TimeRange): Promise<Insights> => {
   };
 };
 
-// Increment visit count for a domain (called on navigation)
+
 export const incrementVisitCount = async (
   domain: string,
   favicon: string,
@@ -307,7 +292,7 @@ export const incrementVisitCount = async (
   });
 };
 
-// Get comprehensive analysis data for a specific site
+
 export const getSiteAnalysisData = async (
   domain: string,
 ): Promise<import("./types").SiteAnalysisData | null> => {
@@ -320,7 +305,7 @@ export const getSiteAnalysisData = async (
   let favicon = "";
   const dailyData: { date: string; time: number; visits: number }[] = [];
 
-  // Get all date keys sorted
+
   const dateKeys = Object.keys(data)
     .filter((key) => key.match(/^\d{4}-\d{2}-\d{2}$/))
     .sort();
@@ -348,7 +333,7 @@ export const getSiteAnalysisData = async (
 
   if (!firstUsed) return null;
 
-  // Generate heat map data (last 26 weeks = 182 days)
+
   const heatMapData: { date: string; time: number; intensity: number }[] = [];
   const today = new Date();
   const maxTimeForIntensity = Math.max(...dailyData.map((d) => d.time), 1);
@@ -381,7 +366,7 @@ export const getSiteAnalysisData = async (
   };
 };
 
-// Get trend metrics for a date range
+
 export const getTrendMetrics = async (
   domain: string,
   startDate: string,
@@ -394,7 +379,7 @@ export const getTrendMetrics = async (
   const daysDiff =
     Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-  // Previous period for comparison
+
   const prevEnd = new Date(start);
   prevEnd.setDate(prevEnd.getDate() - 1);
   const prevStart = new Date(prevEnd);
@@ -421,7 +406,7 @@ export const getTrendMetrics = async (
 
     const siteData = dayData[domain];
 
-    // Current period
+
     if (keyDate >= start && keyDate <= end) {
       activeDays++;
       totalTime += siteData.time;
@@ -434,7 +419,7 @@ export const getTrendMetrics = async (
         maxDailyVisits = siteData.visitCount || 0;
     }
 
-    // Previous period
+
     if (keyDate >= prevStart && keyDate <= prevEnd) {
       prevTotalTime += siteData.time;
       prevTotalVisits += siteData.visitCount || 0;
@@ -542,7 +527,7 @@ export const getDailyUsage = async (
   };
 };
 
-// Site Categories functions
+
 export const getSiteCategories = async (): Promise<SiteCategoryMap> => {
   const data = await getStorageData(SITE_CATEGORIES_KEY);
   return (data[SITE_CATEGORIES_KEY] as SiteCategoryMap) || {};
@@ -572,7 +557,7 @@ export const getFocusScore = async (range: TimeRange): Promise<FocusScore> => {
   let neutralTime = 0;
   let othersTime = 0;
 
-  // Categorize time spent on each domain
+
   aggregatedData.byDomain.forEach((site) => {
     const category = categories[site.domain] || "others";
     switch (category) {
@@ -593,15 +578,14 @@ export const getFocusScore = async (range: TimeRange): Promise<FocusScore> => {
 
   const totalTime = aggregatedData.totalTime;
 
-  // Calculate focus score (0-100)
-  // Formula: score = 50 + (productiveTime * 1.0 - distractionTime * 0.5 + othersTime * 0.2) / totalTime * 50
+
   let score = 50;
   if (totalTime > 0) {
     const weightedScore =
       (productiveTime * 1.0 - distractionTime * 0.5 + othersTime * 0.2) /
       totalTime;
     score = Math.round(50 + weightedScore * 50);
-    // Clamp between 0 and 100
+
     score = Math.max(0, Math.min(100, score));
   }
 

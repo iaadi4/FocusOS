@@ -150,7 +150,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: Trophy,
     category: "time",
   },
-  // Secret Achievements
   {
     id: "the-glitch",
     title: "The Glitch",
