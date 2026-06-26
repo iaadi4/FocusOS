@@ -1,17 +1,53 @@
 @import "tailwindcss";
 
+@theme {
+  --color-bg-page: #0A0A0A;
+  --color-bg-card: #111111;
+  --color-bg-elevated: #1A1A1A;
+  --color-bg-nav: #0D0D0D;
+  --color-border: #242424;
+  --color-border-subtle: #1C1C1C;
+
+  --color-gold: #C9A96E;
+  --color-gold-hover: #D9BA84;
+  --color-gold-dim: #8A7248;
+  --color-gold-bg: rgba(201, 169, 110, 0.06);
+
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #8A8A8A;
+  --color-text-muted: #4A4A4A;
+  --color-text-inverse: #0A0A0A;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
 :root {
-  /* Enforce Dark Theme for Premium Feel */
-  --background: #000000;
-  --foreground: #ffffff;
+  --color-bg-page: #0A0A0A;
+  --color-bg-card: #111111;
+  --color-bg-elevated: #1A1A1A;
+  --color-bg-nav: #0D0D0D;
+  --color-border: #242424;
+  --color-border-subtle: #1C1C1C;
+
+  --color-gold: #C9A96E;
+  --color-gold-hover: #D9BA84;
+  --color-gold-dim: #8A7248;
+  --color-gold-bg: rgba(201, 169, 110, 0.06);
+
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #8A8A8A;
+  --color-text-muted: #4A4A4A;
+  --color-text-inverse: #0A0A0A;
+}
+
+* {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  background: #0A0A0A;
+  color: #F5F5F5;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
 
@@ -21,53 +57,25 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #0A0A0A;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #242424;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #C9A96E;
 }
 
-/* Utilities */
 @layer utilities {
-  .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
-
-  .text-gradient {
-    background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7e22ce 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
-/* Animations */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.grid-bg {
-  background-size: 40px 40px;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-}

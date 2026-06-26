@@ -27,7 +27,7 @@ export default function ParticlesBackground() {
     let height = 0;
 
     // Grid configuration
-    const spacing = 40; // Space between dots
+    const spacing = 42; // Space between dots
     const baseSize = 1.2; // Min size
 
     const resize = () => {
@@ -50,8 +50,8 @@ export default function ParticlesBackground() {
             y: j * spacing + spacing / 2,
             baseSize: baseSize,
             size: baseSize,
-            speed: Math.random() * 0.002 + 0.001, // Breathing speed
-            offset: Math.random() * Math.PI * 2, // Random starting phase
+            speed: Math.random() * 0.0015 + 0.0008, // Subtle industrial breathing speed
+            offset: Math.random() * Math.PI * 2,
           });
         }
       }
@@ -63,16 +63,14 @@ export default function ParticlesBackground() {
       const time = Date.now();
 
       particles.forEach((p) => {
-        // Breathing formula: size oscillates using sine wave
         const cycle = Math.sin(time * p.speed + p.offset);
-        // Map sine (-1 to 1) to opacity/size range
-        // We want opacity to go from ~0.1 to ~0.5
-        const alpha = ((cycle + 1) / 2) * 0.4 + 0.1;
+        // Alpha oscillates between ~0.08 and ~0.28
+        const alpha = ((cycle + 1) / 2) * 0.2 + 0.08;
 
-        ctx.fillStyle = `rgba(168, 85, 247, ${alpha})`; // Purple-500 equivalent
+        // Warm gold #C9A96E (RGB: 201, 169, 110)
+        ctx.fillStyle = `rgba(201, 169, 110, ${alpha})`;
         ctx.beginPath();
-        // Size also breathes slightly
-        const currentSize = p.baseSize + (cycle + 1) * 0.5;
+        const currentSize = p.baseSize + (cycle + 1) * 0.4;
         ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
         ctx.fill();
       });
@@ -93,7 +91,7 @@ export default function ParticlesBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none opacity-60"
+      className="fixed inset-0 z-0 pointer-events-none opacity-80"
       style={{ background: "transparent" }}
     />
   );
